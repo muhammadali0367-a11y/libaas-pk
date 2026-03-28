@@ -30,11 +30,11 @@ export default function PartnerPage() {
       {/* NAV */}
       <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
         <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <a href="mailto:hello@thelibaas.pk"
+        <Link href="/auth?role=brand"
           className="font-body text-xs px-5 py-2.5 rounded-full"
           style={{ background: '#C9A84C', color: '#000' }}>
-          Contact Us
-        </a>
+          Get Started
+        </Link>
       </nav>
 
       {/* HERO */}
@@ -52,11 +52,11 @@ export default function PartnerPage() {
           You only pay when a sale is confirmed.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="mailto:hello@thelibaas.pk"
+          <Link href="/auth?role=brand"
             className="font-body px-8 py-4 rounded-full text-sm font-medium"
             style={{ background: '#C9A84C', color: '#000' }}>
             Claim a Founding Partner Slot →
-          </a>
+          </Link>
           <Link href="/demo"
             className="font-body px-8 py-4 rounded-full text-sm border border-white/20 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all">
             See Creator Storefront
@@ -151,11 +151,11 @@ export default function PartnerPage() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:hello@thelibaas.pk"
+              <Link href="/auth?role=brand"
                 className="block w-full text-center font-body text-sm py-3.5 rounded-xl font-medium"
                 style={{ background: 'rgba(255,255,255,0.05)', color: '#fff' }}>
-                Get in Touch →
-              </a>
+                Get Started Free →
+              </Link>
             </div>
 
             {/* Founding Partner */}
@@ -191,11 +191,11 @@ export default function PartnerPage() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:hello@thelibaas.pk"
+              <Link href="/auth?role=brand"
                 className="block w-full text-center font-body text-sm py-3.5 rounded-xl font-medium transition-opacity hover:opacity-90"
                 style={{ background: '#C9A84C', color: '#000' }}>
                 Claim Your Slot →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -229,13 +229,13 @@ export default function PartnerPage() {
           </h2>
           <p className="font-body mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
             Only 3 founding brand partner slots available.
-            Email us to claim yours before we open to the public.
+            Sign up now to claim yours before we open to the public.
           </p>
-          <a href="mailto:hello@thelibaas.pk"
+          <Link href="/auth?role=brand"
             className="inline-block font-body px-10 py-4 rounded-full text-sm font-medium"
             style={{ background: '#C9A84C', color: '#000' }}>
-            Email Us to Partner →
-          </a>
+            Become a Partner →
+          </Link>
         </div>
       </section>
 

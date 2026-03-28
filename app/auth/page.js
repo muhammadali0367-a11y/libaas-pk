@@ -1,12 +1,12 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function AuthPage() {
-  const [mode, setMode] = useState('login') // 'login' | 'signup'
-  const [role, setRole] = useState('creator') // 'creator' | 'brand'
+  const [mode, setMode] = useState('login')
+  const [role, setRole] = useState('creator')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
@@ -15,6 +15,15 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const router = useRouter()
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const roleParam = params.get('role')
+    if (roleParam === 'brand') {
+      setRole('brand')
+      setMode('signup')
+    }
+  }, [])
+
   async function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
@@ -22,7 +31,6 @@ export default function AuthPage() {
 
     try {
       if (mode === 'signup') {
-        // Sign up
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -32,7 +40,6 @@ export default function AuthPage() {
         })
         if (signUpError) throw signUpError
 
-        // Create profile row
         if (role === 'creator') {
           const { error: profileError } = await supabase
             .from('creators')
@@ -55,14 +62,12 @@ export default function AuthPage() {
           router.push('/brand/dashboard')
         }
       } else {
-        // Login
         const { data, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (loginError) throw loginError
 
-        // Check role and redirect
         const { data: creator } = await supabase
           .from('creators')
           .select('id')

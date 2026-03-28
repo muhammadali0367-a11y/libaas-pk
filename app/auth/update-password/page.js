@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -108,15 +108,3 @@ export default function UpdatePassword() {
     </main>
   )
 }
-```
-
----
-
-**One Supabase setting to enable:**
-Go to Supabase → **Authentication → URL Configuration** → add your site URL:
-```
-https://www.thelibaas.pk
-```
-And add this to Redirect URLs:
-```
-https://www.thelibaas.pk/auth/update-password

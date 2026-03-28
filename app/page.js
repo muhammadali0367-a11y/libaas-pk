@@ -3,21 +3,21 @@ import Link from 'next/link'
 const BRANDS = ['Saya', 'Beechtree', 'Asim Jofa', 'Limelight', 'Ethnic', 'Zellbury', 'Bonanza', 'Alkaram', 'Baroque', 'Stylo']
 
 const HOW_IT_WORKS = [
-  { step: '01', title: 'Brands Join', desc: 'Pakistani fashion brands list their products and set a commission rate.' },
+  { step: '01', title: 'Brands Join', desc: 'Pakistani fashion brands list their products and agree on a commission rate with us.' },
   { step: '02', title: 'Creators Curate', desc: 'Creators build their personal storefront with products they genuinely love.' },
   { step: '03', title: 'Audience Shops', desc: 'Followers shop through the creator\'s page — every sale tracked in real time.' },
-  { step: '04', title: 'Everyone Earns', desc: 'Creators earn 10–15% commission in PKR. Brands get measurable ROI.' },
+  { step: '04', title: 'Everyone Earns', desc: 'Creators earn commission in PKR. Brands get measurable ROI. We take a small platform fee.' },
 ]
 
 const CREATOR_BENEFITS = [
   { icon: '🛍️', title: 'Your Own Storefront', desc: 'A beautiful shop page at libaas.pk/yourname — curated by you, for your audience.' },
-  { icon: '💰', title: 'Earn in PKR', desc: '10–15% commission on every sale. Paid directly to JazzCash or your bank account.' },
+  { icon: '💰', title: 'Earn in PKR', desc: 'Earn commission on every sale you drive — paid directly to JazzCash or your bank account.' },
   { icon: '📊', title: 'Real-Time Analytics', desc: 'See your clicks, orders, and earnings updated live in your dashboard.' },
   { icon: '🤝', title: 'Work With Top Brands', desc: 'Access to Pakistan\'s best fashion brands — Saya, Beechtree, Baroque and more.' },
 ]
 
 const BRAND_BENEFITS = [
-  { icon: '📈', title: 'Performance-Based', desc: 'Pay only when a sale happens. Zero wasted spend on influencers who don\'t convert.' },
+  { icon: '📈', title: 'Performance-Based', desc: 'Pay commission only when a sale happens. Zero wasted spend on influencers who don\'t convert.' },
   { icon: '🎯', title: 'Full Attribution', desc: 'See exactly which creator drove which sale — down to the SKU level.' },
   { icon: '👥', title: '50+ Vetted Creators', desc: 'Your products promoted by our founding creator cohort from day one.' },
   { icon: '⚡', title: 'Zero Admin', desc: 'We handle all creator payouts. No invoices, no reconciliation headaches.' },
@@ -26,7 +26,6 @@ const BRAND_BENEFITS = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white font-sans">
-      {/* Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
         :root {
@@ -85,7 +84,7 @@ export default function HomePage() {
             <Link href="/demo" className="font-body text-sm text-white/60 hover:text-white transition-colors">
               See Demo
             </Link>
-            <Link href="/demo" className="font-body text-sm bg-gold text-black px-5 py-2 rounded-full font-medium hover:opacity-90 transition-opacity">
+            <Link href="/join" className="font-body text-sm bg-gold text-black px-5 py-2 rounded-full font-medium hover:opacity-90 transition-opacity">
               Get Early Access
             </Link>
           </div>
@@ -94,7 +93,6 @@ export default function HomePage() {
 
       {/* HERO */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
-        {/* Background texture */}
         <div className="absolute inset-0 opacity-5" style={{
           backgroundImage: `radial-gradient(circle at 25% 25%, #C9A84C 0%, transparent 50%),
                             radial-gradient(circle at 75% 75%, #C9A84C 0%, transparent 50%)`
@@ -114,17 +112,17 @@ export default function HomePage() {
           </h1>
           <p className="font-body text-lg text-white/50 max-w-xl mx-auto mb-12 leading-relaxed animate-fade-up-delay-2">
             Build your personal fashion storefront. Curate products from Pakistan&apos;s top brands.
-            Earn 10–15% commission on every sale — paid in PKR.
+            Earn commission on every sale — paid in PKR, directly to your account.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up-delay-2">
             <Link href="/demo"
               className="font-body bg-gold text-black px-8 py-4 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
               See a Creator Storefront →
             </Link>
-            <a href="mailto:hello@thelibaas.pk"
+            <Link href="/partner"
               className="font-body border border-white/20 text-white px-8 py-4 rounded-full text-sm hover:border-gold hover:text-gold transition-all">
               Partner as a Brand
-            </a>
+            </Link>
           </div>
 
           {/* Brand strip */}
@@ -175,9 +173,9 @@ export default function HomePage() {
                 Stop doing one-off paid promotions for brands you barely know.
                 Build a real income stream by curating products your audience already trusts you on.
               </p>
-              <Link href="/demo"
+              <Link href="/join"
                 className="inline-block font-body text-sm border border-gold text-gold px-6 py-3 rounded-full hover:bg-gold hover:text-black transition-all">
-                See Demo Storefront →
+                Join as a Creator →
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -217,10 +215,10 @@ export default function HomePage() {
                 Libaas gives you complete attribution — every click, every order, every creator.
                 Only 3 founding brand partner slots available.
               </p>
-              <a href="mailto:hello@thelibaas.pk"
+              <Link href="/partner"
                 className="inline-block font-body text-sm bg-gold text-black px-6 py-3 rounded-full font-medium hover:opacity-90 transition-opacity">
                 Claim a Founding Partner Slot →
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -232,7 +230,7 @@ export default function HomePage() {
           <div className="grid grid-cols-3 gap-8 text-center">
             {[
               { number: '50+', label: 'Founding Creators' },
-              { number: '10–15%', label: 'Commission Rate' },
+              { number: '10+', label: 'Pakistani Brands' },
               { number: 'PKR', label: 'Direct Payouts' },
             ].map(({ number, label }) => (
               <div key={label}>
@@ -256,14 +254,14 @@ export default function HomePage() {
             looking to monetize your taste or a brand wanting measurable creator marketing — Libaas is for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/demo"
+            <Link href="/join"
               className="font-body bg-gold text-black px-8 py-4 rounded-full text-sm font-medium hover:opacity-90 transition-opacity">
-              Explore Demo Storefront
+              Join as a Creator
             </Link>
-            <a href="mailto:hello@thelibaas.pk"
+            <Link href="/partner"
               className="font-body border border-white/20 text-white px-8 py-4 rounded-full text-sm hover:border-gold hover:text-gold transition-all">
-              Contact Us
-            </a>
+              Partner as a Brand
+            </Link>
           </div>
         </div>
       </section>

@@ -211,6 +211,17 @@ export default function AuthPage() {
               />
             </div>
 
+            {/* Forgot password */}
+            {mode === 'login' && (
+              <div className="text-right">
+                <Link href="/auth/reset"
+                  className="font-body text-xs hover:underline"
+                  style={{ color: '#C9A84C' }}>
+                  Forgot password?
+                </Link>
+              </div>
+            )}
+
             {/* Error */}
             {error && (
               <p className="font-body text-xs text-red-400 bg-red-400/10 rounded-xl px-4 py-3">

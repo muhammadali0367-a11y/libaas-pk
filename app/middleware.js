@@ -25,11 +25,11 @@ export async function middleware(request) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protect dashboard routes
-  if (!user && (
+  const isProtected =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/brand/dashboard')
-  )) {
+
+  if (!user && isProtected) {
     return NextResponse.redirect(new URL('/auth', request.url))
   }
 

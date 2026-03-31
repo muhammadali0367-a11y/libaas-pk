@@ -131,7 +131,7 @@ async function migrate() {
       const batch = toInsert.slice(i, i + BATCH)
       const { error: insertError } = await libaas
         .from('products')
-        .upsert(batch, { onConflict: 'id', ignoreDuplicates: false })
+        .upsert(batch, { onConflict: 'id', ignoreDuplicates: true })
 
       if (insertError) {
         console.error(`   ❌ Insert error (batch ${i / BATCH + 1}):`, insertError.message)

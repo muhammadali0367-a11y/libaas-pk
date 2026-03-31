@@ -4,6 +4,19 @@ import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAFA; }
+  .card { background: #fff; border-radius: 14px; border: 1px solid #F0F0F0; }
+  .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: rgba(22,163,74,0.1); color: #16a34a; }
+  .badge-amber { background: rgba(184,149,42,0.12); color: #92700A; }
+  .badge-red { background: rgba(220,38,38,0.1); color: #DC2626; }
+  .nav-link { font-size: 13px; color: #6B6B6B; text-decoration: none; }
+`
+
 export default function Earnings() {
   const [creator, setCreator] = useState(null)
   const [orders, setOrders] = useState([])
@@ -16,36 +29,14 @@ export default function Earnings() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth'); return }
-
-      const { data: creatorData } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
+      const { data: creatorData } = await supabase.from('creators').select('*').eq('user_id', user.id).single()
       if (!creatorData) { router.push('/auth'); return }
       setCreator(creatorData)
-
-      // Orders
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('*, products(name, image_url), brands(name)')
-        .eq('creator_id', creatorData.id)
-        .order('created_at', { ascending: false })
-
-      // Payouts
-      const { data: payoutsData } = await supabase
-        .from('payouts')
-        .select('*')
-        .eq('creator_id', creatorData.id)
-        .order('created_at', { ascending: false })
-
-      // Affiliate links with clicks
-      const { data: linksData } = await supabase
-        .from('affiliate_links')
-        .select('*, products(name, image_url, brands(name))')
-        .eq('creator_id', creatorData.id)
-        .order('clicks', { ascending: false })
-
+      const [{ data: ordersData }, { data: payoutsData }, { data: linksData }] = await Promise.all([
+        supabase.from('orders').select('*, products(name, image_url), brands(name)').eq('creator_id', creatorData.id).order('created_at', { ascending: false }),
+        supabase.from('payouts').select('*').eq('creator_id', creatorData.id).order('created_at', { ascending: false }),
+        supabase.from('affiliate_links').select('*, products(name, image_url, brands(name))').eq('creator_id', creatorData.id).order('clicks', { ascending: false }),
+      ])
       setOrders(ordersData || [])
       setPayouts(payoutsData || [])
       setLinks(linksData || [])
@@ -54,93 +45,69 @@ export default function Earnings() {
     load()
   }, [])
 
-  const totalEarned = orders
-    .filter(o => o.status === 'confirmed')
-    .reduce((sum, o) => sum + (o.commission_amount || 0), 0)
-
-  const totalPending = orders
-    .filter(o => o.status === 'pending')
-    .reduce((sum, o) => sum + (o.commission_amount || 0), 0)
-
-  const totalPaid = payouts
-    .filter(p => p.status === 'paid')
-    .reduce((sum, p) => sum + (p.amount || 0), 0)
-
-  const totalClicks = links.reduce((sum, l) => sum + (l.clicks || 0), 0)
+  const totalEarned = orders.filter(o => o.status === 'confirmed').reduce((s, o) => s + (o.commission_amount || 0), 0)
+  const totalPending = orders.filter(o => o.status === 'pending').reduce((s, o) => s + (o.commission_amount || 0), 0)
+  const totalPaid = payouts.filter(p => p.status === 'paid').reduce((s, p) => s + (p.amount || 0), 0)
+  const totalClicks = links.reduce((s, l) => s + (l.clicks || 0), 0)
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-      <p style={{ fontFamily: "'DM Sans', sans-serif", color: '#C9A84C', fontSize: '14px' }}>Loading...</p>
+    <div style={{ minHeight: '100vh', background: '#FAFAFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#9B9B9B' }}>Loading...</p>
     </div>
   )
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-      `}</style>
+    <main style={{ minHeight: '100vh', background: '#FAFAFA', fontFamily: "'Inter', sans-serif" }}>
+      <style>{S}</style>
 
-      {/* NAV */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <Link href="/dashboard" className="font-body text-xs text-white/40 hover:text-white transition-colors">
-          ← Back to Dashboard
-        </Link>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #F0F0F0', padding: '0 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <Link href="/dashboard" className="nav-link">← Back to Dashboard</Link>
+        </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-
-        {/* Header */}
-        <div className="mb-10">
-          <p className="font-body text-xs tracking-widest text-white/30 uppercase mb-1">Finance</p>
-          <h1 className="font-display text-4xl">Earnings & Payouts</h1>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+        <div style={{ marginBottom: 32 }}>
+          <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 8 }}>Finance</p>
+          <h1 className="display" style={{ fontSize: 36, fontWeight: 700, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Earnings & Payouts</h1>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
           {[
-            { label: 'Total Clicks', value: totalClicks, icon: '👆', color: '#fff' },
-            { label: 'Confirmed Earnings', value: `PKR ${totalEarned.toLocaleString()}`, icon: '✅', color: '#C9A84C' },
-            { label: 'Pending Earnings', value: `PKR ${totalPending.toLocaleString()}`, icon: '⏳', color: '#fff' },
-            { label: 'Total Paid Out', value: `PKR ${totalPaid.toLocaleString()}`, icon: '💸', color: '#4CAF82' },
-          ].map(({ label, value, icon, color }) => (
-            <div key={label} className="bg-[#141414] border border-white/5 rounded-2xl p-5">
-              <span className="text-xl mb-3 block">{icon}</span>
-              <p className="font-display text-2xl mb-1" style={{ color }}>{value}</p>
-              <p className="font-body text-xs text-white/30 uppercase tracking-widest">{label}</p>
+            { label: 'Total Clicks', value: totalClicks },
+            { label: 'Confirmed Earnings', value: `PKR ${totalEarned.toLocaleString()}`, highlight: true },
+            { label: 'Pending Earnings', value: `PKR ${totalPending.toLocaleString()}` },
+            { label: 'Total Paid Out', value: `PKR ${totalPaid.toLocaleString()}` },
+          ].map(({ label, value, highlight }) => (
+            <div key={label} className="card" style={{ padding: 24 }}>
+              <p className="display" style={{ fontSize: 28, fontWeight: 700, color: highlight ? '#B8952A' : '#1A1A1A', marginBottom: 6, letterSpacing: '-0.01em' }}>{value}</p>
+              <p style={{ fontSize: 11, color: '#9B9B9B', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</p>
             </div>
           ))}
         </div>
 
-        {/* Top performing links */}
+        {/* Top links */}
         {links.length > 0 && (
-          <div className="mb-10">
-            <h2 className="font-display text-2xl mb-4">Top Performing Links</h2>
-            <div className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
+          <div style={{ marginBottom: 28 }}>
+            <h2 className="display" style={{ fontSize: 24, fontWeight: 600, marginBottom: 16, color: '#1A1A1A' }}>Top Performing Links</h2>
+            <div className="card" style={{ overflow: 'hidden' }}>
               {links.slice(0, 5).map((link, i) => (
-                <div key={link.id}
-                  className="flex items-center gap-4 px-5 py-4 border-b border-white/5 last:border-0">
-                  <span className="font-body text-sm text-white/20 w-5">{i + 1}</span>
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                    {link.products?.image_url && (
-                      <img src={link.products.image_url} alt="" className="w-full h-full object-cover" />
-                    )}
+                <div key={link.id} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderBottom: i < 4 ? '1px solid #F0F0F0' : 'none' }}>
+                  <span style={{ fontSize: 13, color: '#C4C4C4', width: 20 }}>{i + 1}</span>
+                  <div style={{ width: 40, height: 40, borderRadius: 8, overflow: 'hidden', background: '#F5F5F5', flexShrink: 0 }}>
+                    {link.products?.image_url && <img src={link.products.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-body text-sm text-white truncate">
-                      {link.products?.name}
-                    </p>
-                    <p className="font-body text-xs text-white/30">
-                      {link.products?.brands?.name}
-                    </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.products?.name}</p>
+                    <p style={{ fontSize: 12, color: '#9B9B9B' }}>{link.products?.brands?.name}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="font-display text-lg" style={{ color: '#C9A84C' }}>
-                      {link.clicks || 0}
-                    </p>
-                    <p className="font-body text-xs text-white/30">clicks</p>
+                  <div style={{ textAlign: 'right' }}>
+                    <p className="display" style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A' }}>{link.clicks || 0}</p>
+                    <p style={{ fontSize: 11, color: '#9B9B9B' }}>clicks</p>
                   </div>
                 </div>
               ))}
@@ -149,53 +116,30 @@ export default function Earnings() {
         )}
 
         {/* Orders */}
-        <div className="mb-10">
-          <h2 className="font-display text-2xl mb-4">Orders</h2>
+        <div style={{ marginBottom: 28 }}>
+          <h2 className="display" style={{ fontSize: 24, fontWeight: 600, marginBottom: 16, color: '#1A1A1A' }}>Orders</h2>
           {orders.length === 0 ? (
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-10 text-center">
-              <p className="font-display text-2xl text-white/20 mb-2">No orders yet</p>
-              <p className="font-body text-sm text-white/20">
-                Share your storefront to start earning!
-              </p>
-              <Link href={`/${creator.username}`} target="_blank"
-                className="inline-block mt-4 font-body text-xs px-5 py-2.5 rounded-full"
-                style={{ background: '#C9A84C', color: '#000' }}>
+            <div className="card" style={{ padding: 48, textAlign: 'center' }}>
+              <p className="display" style={{ fontSize: 24, color: '#C4C4C4', marginBottom: 8 }}>No orders yet</p>
+              <p style={{ fontSize: 14, color: '#9B9B9B', marginBottom: 20 }}>Share your storefront to start earning!</p>
+              <Link href={`/${creator.username}`} target="_blank" style={{ background: '#1A1A1A', color: '#fff', borderRadius: 100, padding: '10px 24px', fontSize: 13, textDecoration: 'none', fontFamily: "'Inter', sans-serif", fontWeight: 500 }}>
                 View My Storefront →
               </Link>
             </div>
           ) : (
-            <div className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
-              <div className="grid grid-cols-4 px-5 py-3 border-b border-white/5">
+            <div className="card" style={{ overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 140px 120px', padding: '12px 20px', borderBottom: '1px solid #F0F0F0' }}>
                 {['Product', 'Amount', 'Commission', 'Status'].map(h => (
-                  <p key={h} className="font-body text-xs text-white/30 uppercase tracking-widest">{h}</p>
+                  <p key={h} style={{ fontSize: 11, fontWeight: 600, color: '#9B9B9B', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{h}</p>
                 ))}
               </div>
               {orders.map(order => (
-                <div key={order.id} className="grid grid-cols-4 px-5 py-4 border-b border-white/5 last:border-0 items-center">
-                  <p className="font-body text-sm text-white truncate pr-4">
-                    {order.products?.name || 'Product'}
-                  </p>
-                  <p className="font-body text-sm text-white">
-                    PKR {order.order_amount?.toLocaleString()}
-                  </p>
-                  <p className="font-body text-sm" style={{ color: '#C9A84C' }}>
-                    PKR {order.commission_amount?.toLocaleString()}
-                  </p>
-                  <span className="inline-flex items-center gap-1.5 font-body text-xs px-3 py-1 rounded-full w-fit"
-                    style={{
-                      background: order.status === 'confirmed'
-                        ? 'rgba(76,175,130,0.1)'
-                        : order.status === 'rejected'
-                          ? 'rgba(255,80,80,0.1)'
-                          : 'rgba(201,168,76,0.1)',
-                      color: order.status === 'confirmed'
-                        ? '#4CAF82'
-                        : order.status === 'rejected'
-                          ? '#ff5050'
-                          : '#C9A84C',
-                    }}>
-                    {order.status === 'confirmed' ? '✓' : order.status === 'rejected' ? '✕' : '⏳'}
-                    {order.status}
+                <div key={order.id} style={{ display: 'grid', gridTemplateColumns: '1fr 140px 140px 120px', padding: '14px 20px', borderBottom: '1px solid #F8F8F8', alignItems: 'center' }}>
+                  <p style={{ fontSize: 14, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: 16 }}>{order.products?.name || 'Product'}</p>
+                  <p style={{ fontSize: 14, color: '#1A1A1A' }}>PKR {order.order_amount?.toLocaleString()}</p>
+                  <p style={{ fontSize: 14, color: '#B8952A', fontWeight: 500 }}>PKR {order.commission_amount?.toLocaleString()}</p>
+                  <span className={`badge ${order.status === 'confirmed' ? 'badge-green' : order.status === 'rejected' ? 'badge-red' : 'badge-amber'}`}>
+                    {order.status === 'confirmed' ? '✓ Confirmed' : order.status === 'rejected' ? '✕ Rejected' : '⏳ Pending'}
                   </span>
                 </div>
               ))}
@@ -205,31 +149,20 @@ export default function Earnings() {
 
         {/* Payouts */}
         <div>
-          <h2 className="font-display text-2xl mb-4">Payout History</h2>
+          <h2 className="display" style={{ fontSize: 24, fontWeight: 600, marginBottom: 16, color: '#1A1A1A' }}>Payout History</h2>
           {payouts.length === 0 ? (
-            <div className="bg-[#141414] rounded-2xl border border-white/5 p-8 text-center">
-              <p className="font-body text-sm text-white/20">No payouts yet</p>
+            <div className="card" style={{ padding: 32, textAlign: 'center' }}>
+              <p style={{ fontSize: 14, color: '#9B9B9B' }}>No payouts yet</p>
             </div>
           ) : (
-            <div className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
-              {payouts.map(payout => (
-                <div key={payout.id}
-                  className="flex items-center justify-between px-5 py-4 border-b border-white/5 last:border-0">
+            <div className="card" style={{ overflow: 'hidden' }}>
+              {payouts.map((payout, i) => (
+                <div key={payout.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: i < payouts.length - 1 ? '1px solid #F0F0F0' : 'none' }}>
                   <div>
-                    <p className="font-body text-sm text-white">
-                      PKR {payout.amount?.toLocaleString()}
-                    </p>
-                    <p className="font-body text-xs text-white/30 mt-0.5">
-                      via {payout.method} · {new Date(payout.created_at).toLocaleDateString()}
-                    </p>
+                    <p style={{ fontSize: 14, fontWeight: 500, color: '#1A1A1A' }}>PKR {payout.amount?.toLocaleString()}</p>
+                    <p style={{ fontSize: 12, color: '#9B9B9B', marginTop: 2 }}>via {payout.method} · {new Date(payout.created_at).toLocaleDateString()}</p>
                   </div>
-                  <span className="font-body text-xs px-3 py-1 rounded-full"
-                    style={{
-                      background: payout.status === 'paid' ? 'rgba(76,175,130,0.1)' : 'rgba(201,168,76,0.1)',
-                      color: payout.status === 'paid' ? '#4CAF82' : '#C9A84C',
-                    }}>
-                    {payout.status}
-                  </span>
+                  <span className={`badge ${payout.status === 'paid' ? 'badge-green' : 'badge-amber'}`}>{payout.status}</span>
                 </div>
               ))}
             </div>

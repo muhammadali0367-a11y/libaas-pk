@@ -1,7 +1,23 @@
+// ============================================================
+// FILE 1: app/auth/reset/page.js
+// ============================================================
 'use client'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
+
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  .input-field { width: 100%; background: #FAFAFA; border: 1px solid #E8E8E8; border-radius: 10px; padding: 13px 16px; font-size: 14px; color: #1A1A1A; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; }
+  .input-field:focus { border-color: #1A1A1A; background: #fff; }
+  .input-field::placeholder { color: #C4C4C4; }
+  .btn-primary { width: 100%; background: #1A1A1A; color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .label { font-size: 12px; font-weight: 500; color: #6B6B6B; display: block; margin-bottom: 6px; }
+`
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('')
@@ -13,87 +29,46 @@ export default function ResetPassword() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/update-password`,
     })
-
-    if (resetError) {
-      setError(resetError.message)
-    } else {
-      setSent(true)
-    }
+    if (resetError) { setError(resetError.message) } else { setSent(true) }
     setLoading(false)
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] flex items-center justify-center px-4">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-      `}</style>
-
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <Link href="/" className="font-display text-3xl tracking-wider" style={{ color: '#C9A84C' }}>
-            LIBAAS
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, fontFamily: "'Inter', sans-serif" }}>
+      <style>{S}</style>
+      <div style={{ width: '100%', maxWidth: 400 }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 28, fontWeight: 700, color: '#1A1A1A' }}>Libaas</span>
           </Link>
         </div>
-
-        <div className="bg-[#141414] border border-white/5 rounded-2xl p-8">
+        <div style={{ background: '#fff', border: '1px solid #E8E8E8', borderRadius: 16, padding: 32, boxShadow: '0 2px 20px rgba(0,0,0,0.06)' }}>
           {sent ? (
-            <div className="text-center">
-              <p className="text-3xl mb-4">📧</p>
-              <h2 className="font-display text-2xl text-white mb-3">Check your email</h2>
-              <p className="font-body text-sm text-white/40 mb-6">
-                We sent a password reset link to <span style={{ color: '#C9A84C' }}>{email}</span>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ width: 56, height: 56, background: '#F0FDF4', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>📧</div>
+              <h2 className="display" style={{ fontSize: 24, fontWeight: 600, marginBottom: 10 }}>Check your email</h2>
+              <p style={{ fontSize: 14, color: '#6B6B6B', marginBottom: 24, lineHeight: 1.6 }}>
+                We sent a reset link to <strong style={{ color: '#1A1A1A' }}>{email}</strong>
               </p>
-              <Link href="/auth"
-                className="font-body text-xs hover:underline"
-                style={{ color: '#C9A84C' }}>
-                ← Back to Login
-              </Link>
+              <Link href="/auth" style={{ fontSize: 13, color: '#1A1A1A', textDecoration: 'none', fontWeight: 500 }}>← Back to Login</Link>
             </div>
           ) : (
             <>
-              <h2 className="font-display text-3xl text-white mb-2">Reset Password</h2>
-              <p className="font-body text-xs text-white/40 mb-6">
-                Enter your email and we'll send you a reset link.
-              </p>
-
-              <form onSubmit={handleReset} className="space-y-4">
+              <h2 className="display" style={{ fontSize: 26, fontWeight: 600, marginBottom: 8 }}>Reset Password</h2>
+              <p style={{ fontSize: 13, color: '#9B9B9B', marginBottom: 24 }}>Enter your email and we'll send you a reset link.</p>
+              <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label className="font-body text-xs text-white/40 block mb-1.5">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-body focus:outline-none focus:border-[#C9A84C] transition-colors"
-                  />
+                  <label className="label">Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="input-field" />
                 </div>
-
-                {error && (
-                  <p className="font-body text-xs text-red-400 bg-red-400/10 rounded-xl px-4 py-3">
-                    {error}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl text-sm font-body font-medium disabled:opacity-50"
-                  style={{ background: '#C9A84C', color: '#000' }}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
-                </button>
+                {error && <p style={{ fontSize: 13, color: '#DC2626', background: '#FEF2F2', padding: '10px 14px', borderRadius: 10 }}>{error}</p>}
+                <button type="submit" disabled={loading} className="btn-primary">{loading ? 'Sending...' : 'Send Reset Link'}</button>
               </form>
-
-              <p className="font-body text-xs text-white/30 text-center mt-6">
-                <Link href="/auth" className="hover:underline" style={{ color: '#C9A84C' }}>
-                  ← Back to Login
-                </Link>
+              <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13 }}>
+                <Link href="/auth" style={{ color: '#1A1A1A', textDecoration: 'none', fontWeight: 500 }}>← Back to Login</Link>
               </p>
             </>
           )}

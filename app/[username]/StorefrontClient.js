@@ -1,134 +1,141 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient'
 
 const CATEGORIES = ['All', 'Pret', 'Lawn', 'Kurta', 'Winter', 'Formal']
 
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  body { font-family: 'Inter', sans-serif; background: #fff; }
+  .product-card { background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.25s; border: 1px solid #F0F0F0; }
+  .product-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.1); transform: translateY(-3px); border-color: #E0E0E0; }
+  .product-img { transition: transform 0.4s ease; width: 100%; height: 100%; object-fit: cover; }
+  .product-card:hover .product-img { transform: scale(1.04); }
+  .shop-btn { opacity: 0; transform: translateY(6px); transition: all 0.22s ease; }
+  .product-card:hover .shop-btn { opacity: 1; transform: translateY(0); }
+  .pill { border-radius: 100px; padding: 7px 18px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid #E8E8E8; background: #fff; color: #6B6B6B; transition: all 0.18s; font-family: 'Inter', sans-serif; }
+  .pill:hover { border-color: #1A1A1A; color: #1A1A1A; }
+  .pill-active { background: #1A1A1A !important; color: #fff !important; border-color: #1A1A1A !important; }
+  .nav-storefront { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #F0F0F0; }
+`
+
 export default function StorefrontClient({ creator, products }) {
   const [activeCategory, setActiveCategory] = useState('All')
-  const [hoveredId, setHoveredId] = useState(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isOwnStorefront, setIsOwnStorefront] = useState(false)
 
-  const filtered = activeCategory === 'All'
-    ? products
-    : products.filter(p => p.category === activeCategory)
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setIsLoggedIn(true)
+        supabase.from('creators').select('username').eq('user_id', user.id).single()
+          .then(({ data }) => {
+            if (data?.username === creator.username) setIsOwnStorefront(true)
+          })
+      }
+    })
+  }, [creator.username])
+
+  const filtered = activeCategory === 'All' ? products : products.filter(p => p.category === activeCategory)
 
   async function handleProductClick(slug, productUrl) {
-    // Track click
-    if (slug) {
-      await fetch(`/api/track/${slug}`, { method: 'POST' }).catch(() => {})
-    }
+    if (slug) await fetch(`/api/track/${slug}`, { method: 'POST' }).catch(() => {})
     window.open(productUrl, '_blank')
   }
 
-  return (
-    <main className="min-h-screen bg-[#FAF7F2]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .product-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-        .product-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.12); }
-        .product-img { transition: transform 0.5s ease; }
-        .product-card:hover .product-img { transform: scale(1.04); }
-        .shop-btn { opacity: 0; transform: translateY(8px); transition: all 0.25s ease; }
-        .product-card:hover .shop-btn { opacity: 1; transform: translateY(0); }
-        .pill-active { background: #0A0A0A; color: #FAF7F2; }
-        .pill-inactive { background: transparent; color: #6B6B6B; border: 1px solid #D1C9BC; }
-        .pill-inactive:hover { border-color: #0A0A0A; color: #0A0A0A; }
-      `}</style>
+  const logoLink = isLoggedIn ? (isOwnStorefront ? '/dashboard' : '/dashboard') : '/'
 
-      {/* Top banner */}
-      <div style={{ background: '#0A0A0A' }} className="text-center py-2.5 px-4">
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', color: '#9B9185', letterSpacing: '0.05em' }}>
+  return (
+    <main style={{ fontFamily: "'Inter', sans-serif", background: '#fff', minHeight: '100vh' }}>
+      <style>{S}</style>
+
+      {/* Support banner */}
+      <div style={{ background: '#1A1A1A', textAlign: 'center', padding: '10px 16px' }}>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontFamily: "'Inter', sans-serif" }}>
           Shop through this page to support{' '}
-          <span style={{ color: '#C9A84C' }}>{creator.full_name || creator.username}</span>
-          {' '}✨
+          <span style={{ color: '#D4AF50', fontWeight: 500 }}>{creator.full_name || creator.username}</span> ✨
         </p>
       </div>
 
       {/* NAV */}
-      <nav className="sticky top-0 z-50 border-b border-[#E5DDD4] backdrop-blur-md"
-        style={{ background: 'rgba(250,247,242,0.92)' }}>
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>
-            LIBAAS
+      <nav className="nav-storefront">
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href={logoLink} style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
           </Link>
-          <p className="text-xs text-[#9B9185]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <p style={{ fontSize: 12, color: '#9B9B9B', fontFamily: "'Inter', sans-serif" }}>
             libaas.pk/{creator.username}
           </p>
-          <a href="mailto:hello@thelibaas.pk"
-            className="text-xs px-4 py-2 rounded-full"
-            style={{ background: '#0A0A0A', color: '#FAF7F2', fontFamily: "'DM Sans', sans-serif" }}>
-            Join as Creator
-          </a>
+          {/* Only show Join as Creator if NOT logged in */}
+          {!isLoggedIn && (
+            <Link href="/join" style={{ background: '#1A1A1A', color: '#fff', borderRadius: 100, padding: '8px 18px', fontSize: 13, fontWeight: 500, textDecoration: 'none', fontFamily: "'Inter', sans-serif" }}>
+              Join as Creator
+            </Link>
+          )}
+          {isLoggedIn && !isOwnStorefront && (
+            <Link href="/dashboard" style={{ fontSize: 13, color: '#6B6B6B', textDecoration: 'none', fontFamily: "'Inter', sans-serif" }}>
+              Dashboard
+            </Link>
+          )}
+          {isOwnStorefront && (
+            <Link href="/dashboard" style={{ background: '#F5F5F5', color: '#1A1A1A', borderRadius: 100, padding: '8px 18px', fontSize: 13, fontWeight: 500, textDecoration: 'none', fontFamily: "'Inter', sans-serif" }}>
+              Edit Storefront
+            </Link>
+          )}
         </div>
       </nav>
 
       {/* CREATOR PROFILE */}
-      <div className="max-w-5xl mx-auto px-6 pt-14 pb-10 text-center">
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '52px 24px 36px', textAlign: 'center' }}>
         {/* Avatar */}
-        <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-5 ring-4 ring-white shadow-lg">
+        <div style={{ width: 96, height: 96, borderRadius: '50%', overflow: 'hidden', margin: '0 auto 20px', border: '3px solid #F0F0F0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
           {creator.avatar_url
-            ? <img src={creator.avatar_url} alt={creator.full_name} className="w-full h-full object-cover" />
-            : (
-              <div className="w-full h-full flex items-center justify-center text-3xl"
-                style={{ background: '#E5DDD4' }}>
-                👤
-              </div>
-            )
+            ? <img src={creator.avatar_url} alt={creator.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <div style={{ width: '100%', height: '100%', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>👤</div>
           }
         </div>
 
-        {/* Name */}
-        <h1 className="font-display text-4xl mb-1" style={{ color: '#0A0A0A' }}>
+        <h1 className="display" style={{ fontSize: 36, fontWeight: 700, color: '#1A1A1A', marginBottom: 8, letterSpacing: '-0.01em' }}>
           {creator.full_name || creator.username}
         </h1>
 
         {creator.instagram && (
-          <a href={`https://instagram.com/${creator.instagram}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm mb-4 inline-block hover:opacity-70 transition-opacity"
-            style={{ color: '#C9A84C', fontFamily: "'DM Sans', sans-serif" }}>
+          <a href={`https://instagram.com/${creator.instagram}`} target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 14, color: '#B8952A', fontWeight: 500, textDecoration: 'none', display: 'block', marginBottom: 12 }}>
             @{creator.instagram}
           </a>
         )}
 
         {creator.bio && (
-          <p className="text-sm max-w-md mx-auto leading-relaxed mb-6 mt-2"
-            style={{ color: '#6B6B6B', fontFamily: "'DM Sans', sans-serif" }}>
+          <p style={{ fontSize: 14, color: '#6B6B6B', maxWidth: 440, margin: '0 auto 24px', lineHeight: 1.7, fontWeight: 300 }}>
             {creator.bio}
           </p>
         )}
 
         {/* Stats */}
-        <div className="flex justify-center gap-10 mb-8">
+        <div style={{ display: 'inline-flex', gap: 0, border: '1px solid #F0F0F0', borderRadius: 12, overflow: 'hidden', marginBottom: 32 }}>
           {[
             { number: products.length, label: 'Picks' },
-            { number: [...new Set(products.map(p => p.brands?.name))].length, label: 'Brands' },
-          ].map(({ number, label }) => (
-            <div key={label} className="text-center">
-              <p className="font-display text-2xl" style={{ color: '#0A0A0A' }}>{number}</p>
-              <p className="text-xs tracking-widest uppercase"
-                style={{ color: '#9B9185', fontFamily: "'DM Sans', sans-serif" }}>
-                {label}
-              </p>
+            { number: [...new Set(products.map(p => p.brands?.name))].filter(Boolean).length, label: 'Brands' },
+          ].map(({ number, label }, i) => (
+            <div key={label} style={{ padding: '14px 32px', borderRight: i === 0 ? '1px solid #F0F0F0' : 'none', textAlign: 'center' }}>
+              <p className="display" style={{ fontSize: 24, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>{number}</p>
+              <p style={{ fontSize: 11, color: '#9B9B9B', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500 }}>{label}</p>
             </div>
           ))}
         </div>
 
         {/* Category pills */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {CATEGORIES.filter(c =>
-            c === 'All' || products.some(p => p.category === c)
-          ).map(col => (
-            <button
-              key={col}
-              onClick={() => setActiveCategory(col)}
-              className={`text-xs px-5 py-2 rounded-full transition-all ${activeCategory === col ? 'pill-active' : 'pill-inactive'}`}
-              style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
+          {CATEGORIES.filter(c => c === 'All' || products.some(p => p.category === c)).map(col => (
+            <button key={col} onClick={() => setActiveCategory(col)}
+              className={`pill ${activeCategory === col ? 'pill-active' : ''}`}>
               {col}
               {col !== 'All' && (
-                <span className="ml-1 opacity-50">
+                <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 11 }}>
                   ({products.filter(p => p.category === col).length})
                 </span>
               )}
@@ -138,67 +145,41 @@ export default function StorefrontClient({ creator, products }) {
       </div>
 
       {/* DIVIDER */}
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1 h-px bg-[#E5DDD4]" />
-          <p className="text-xs tracking-[0.2em] uppercase"
-            style={{ color: '#9B9185', fontFamily: "'DM Sans', sans-serif" }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
+          <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
+          <p style={{ fontSize: 11, color: '#9B9B9B', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500 }}>
             {filtered.length} picks
           </p>
-          <div className="flex-1 h-px bg-[#E5DDD4]" />
+          <div style={{ flex: 1, height: 1, background: '#F0F0F0' }} />
         </div>
       </div>
 
       {/* PRODUCT GRID */}
-      <div className="max-w-5xl mx-auto px-6 pb-24">
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px 80px' }}>
         {filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="font-display text-3xl mb-2" style={{ color: '#9B9185' }}>
-              No picks yet
-            </p>
-            <p className="text-sm" style={{ color: '#9B9185', fontFamily: "'DM Sans', sans-serif" }}>
-              Check back soon!
-            </p>
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <p className="display" style={{ fontSize: 28, color: '#C4C4C4', marginBottom: 8 }}>No picks yet</p>
+            <p style={{ fontSize: 14, color: '#9B9B9B' }}>Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
             {filtered.map(product => (
-              <div
-                key={product.id}
-                className="product-card bg-white rounded-2xl overflow-hidden cursor-pointer"
-                onMouseEnter={() => setHoveredId(product.id)}
-                onMouseLeave={() => setHoveredId(null)}
+              <div key={product.id} className="product-card"
                 onClick={() => handleProductClick(product.affiliate_slug, product.product_url)}>
-
-                {/* Image */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F0EB]">
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="product-img w-full h-full object-cover"
-                    onError={e => { e.target.src = 'https://via.placeholder.com/300x400/F5F0EB/9B9185?text=No+Image' }}
-                  />
-                  {/* Brand badge */}
-                  <span className="absolute top-3 left-3 text-xs px-2 py-1 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.9)', color: '#6B6B6B', fontFamily: "'DM Sans', sans-serif", fontSize: '10px' }}>
+                <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden', background: '#F5F5F5' }}>
+                  <img src={product.image_url} alt={product.name} className="product-img"
+                    onError={e => { e.target.src = 'https://via.placeholder.com/300x400/F5F5F5/C4C4C4?text=No+Image' }} />
+                  <span style={{ position: 'absolute', top: 12, left: 12, background: 'rgba(255,255,255,0.92)', color: '#6B6B6B', borderRadius: 100, padding: '4px 10px', fontSize: 11, fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
                     {product.brands?.name}
                   </span>
-                  {/* Shop button */}
-                  <div className="shop-btn absolute bottom-3 left-3 right-3 text-center text-xs py-2.5 rounded-xl font-medium"
-                    style={{ background: '#0A0A0A', color: '#FAF7F2', fontFamily: "'DM Sans', sans-serif" }}>
+                  <div className="shop-btn" style={{ position: 'absolute', bottom: 12, left: 12, right: 12, background: '#1A1A1A', color: '#fff', textAlign: 'center', padding: '10px', borderRadius: 100, fontSize: 13, fontWeight: 500, fontFamily: "'Inter', sans-serif" }}>
                     Shop Now →
                   </div>
                 </div>
-
-                {/* Info */}
-                <div className="p-3">
-                  <p className="text-xs font-medium truncate mb-1"
-                    style={{ color: '#0A0A0A', fontFamily: "'DM Sans', sans-serif" }}>
-                    {product.name}
-                  </p>
-                  <p className="text-xs" style={{ color: '#C9A84C', fontFamily: "'DM Sans', sans-serif" }}>
-                    PKR {product.price?.toLocaleString()}
-                  </p>
+                <div style={{ padding: '14px 16px' }}>
+                  <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1A1A', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                  <p style={{ fontSize: 13, color: '#B8952A', fontWeight: 500 }}>PKR {product.price?.toLocaleString()}</p>
                 </div>
               </div>
             ))}
@@ -206,18 +187,18 @@ export default function StorefrontClient({ creator, products }) {
         )}
       </div>
 
-      {/* BOTTOM CTA */}
-      <div className="border-t border-[#E5DDD4] py-16 text-center" style={{ background: '#0A0A0A' }}>
-        <p className="font-display text-3xl text-white mb-2">Want a storefront like this?</p>
-        <p className="text-sm mb-8" style={{ color: '#6B6B6B', fontFamily: "'DM Sans', sans-serif" }}>
-          Join Libaas and start earning from your fashion picks.
-        </p>
-        <a href="mailto:hello@thelibaas.pk"
-          className="inline-block text-sm px-8 py-4 rounded-full font-medium"
-          style={{ background: '#C9A84C', color: '#0A0A0A', fontFamily: "'DM Sans', sans-serif" }}>
-          Get Early Access
-        </a>
-      </div>
+      {/* BOTTOM CTA — only show if not logged in */}
+      {!isLoggedIn && (
+        <div style={{ background: '#FAFAFA', borderTop: '1px solid #F0F0F0', padding: '56px 24px', textAlign: 'center' }}>
+          <h3 className="display" style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 10 }}>Want a storefront like this?</h3>
+          <p style={{ fontSize: 14, color: '#6B6B6B', marginBottom: 28, fontWeight: 300 }}>
+            Join Libaas and start earning from your fashion picks.
+          </p>
+          <Link href="/join" style={{ background: '#1A1A1A', color: '#fff', borderRadius: 100, padding: '13px 32px', fontSize: 14, fontWeight: 500, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
+            Get Started Free →
+          </Link>
+        </div>
+      )}
     </main>
   )
 }

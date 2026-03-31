@@ -1,199 +1,157 @@
 import Link from 'next/link'
 
-const BENEFITS = [
-  { icon: '📈', title: 'Performance-Based Only', desc: 'Pay commission only when a sale happens. Zero wasted spend on influencers who don\'t convert.' },
-  { icon: '🎯', title: 'Full Attribution', desc: 'See exactly which creator drove which sale — down to the SKU level. Real data, not estimates.' },
-  { icon: '👥', title: '50+ Vetted Creators', desc: 'Your products promoted by our founding creator cohort from day one of joining.' },
-  { icon: '⚡', title: 'Zero Admin', desc: 'We handle all creator payouts. No invoices, no reconciliation, no WhatsApp back and forth.' },
-  { icon: '📊', title: 'Live Dashboard', desc: 'Real-time view of clicks, orders, and revenue per creator — updated instantly.' },
-  { icon: '🔒', title: 'Founding Rate Lock', desc: 'Early brand partners lock in the lowest subscription rate forever.' },
-]
-
 const HOW = [
   { step: '01', title: 'You Set Commission', desc: 'Agree on a total commission rate with us. We split it between the creator and our platform fee.' },
   { step: '02', title: 'Creators Promote', desc: 'Our vetted creators add your products to their storefronts and share with their audiences.' },
   { step: '03', title: 'Sales Are Tracked', desc: 'Every click and sale is tracked in real time. You confirm orders monthly.' },
-  { step: '04', title: 'Pay Only on Results', desc: 'You pay commission only on confirmed sales. We handle creator payouts — nothing for you to manage.' },
+  { step: '04', title: 'Pay Only on Results', desc: 'You pay commission only on confirmed sales. We handle creator payouts.' },
 ]
+
+const BENEFITS = [
+  { title: 'Performance-Based Only', desc: 'Pay commission only when a sale happens. Zero wasted spend on influencers who don\'t convert.' },
+  { title: 'Full Attribution', desc: 'See exactly which creator drove which sale — down to the SKU level. Real data, not estimates.' },
+  { title: '50+ Vetted Creators', desc: 'Your products promoted by our founding creator cohort from day one of joining.' },
+  { title: 'Zero Admin', desc: 'We handle all creator payouts. No invoices, no reconciliation, no WhatsApp back and forth.' },
+  { title: 'Live Dashboard', desc: 'Real-time view of clicks, orders, and revenue per creator — updated instantly.' },
+  { title: 'Founding Rate Lock', desc: 'Early brand partners lock in the lowest subscription rate forever.' },
+]
+
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  .nav-link { font-size: 13px; color: #6B6B6B; text-decoration: none; }
+  .btn-primary { background: #1A1A1A; color: #fff; border: none; border-radius: 100px; padding: 13px 28px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-secondary { background: transparent; color: #1A1A1A; border: 1.5px solid #E8E8E8; border-radius: 100px; padding: 12px 28px; font-size: 14px; font-weight: 500; text-decoration: none; display: inline-block; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-secondary:hover { border-color: #1A1A1A; }
+  .btn-gold { background: #B8952A; color: #fff; border: none; border-radius: 100px; padding: 13px 28px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-gold:hover { opacity: 0.88; }
+  .card { background: #FAFAFA; border-radius: 14px; border: 1px solid #F0F0F0; padding: 24px; }
+  .step-num { font-family: 'Playfair Display', Georgia, serif; font-size: 40px; font-weight: 700; color: #F0F0F0; line-height: 1; margin-bottom: 14px; }
+  .check { width: 20px; height: 20px; background: #F0F0F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 10px; color: #6B6B6B; }
+  .check-gold { background: rgba(184,149,42,0.12); color: #B8952A; }
+`
 
 export default function PartnerPage() {
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); border-color: rgba(201,168,76,0.3) !important; }
-      `}</style>
+    <main style={{ fontFamily: "'Inter', sans-serif", background: '#fff', color: '#1A1A1A' }}>
+      <style>{S}</style>
 
       {/* NAV */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <Link href="/auth?role=brand"
-          className="font-body text-xs px-5 py-2.5 rounded-full"
-          style={{ background: '#C9A84C', color: '#000' }}>
-          Get Started
-        </Link>
+      <nav style={{ borderBottom: '1px solid #F0F0F0', padding: '0 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 22, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <Link href="/auth?role=brand" className="btn-primary" style={{ padding: '9px 20px', fontSize: 13 }}>Get Started</Link>
+        </div>
       </nav>
 
       {/* HERO */}
-      <section className="max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
-        <p className="font-body text-xs tracking-[0.3em] mb-6 uppercase" style={{ color: '#C9A84C' }}>
-          For Brands
-        </p>
-        <h1 className="font-display text-6xl md:text-8xl leading-[0.9] mb-8">
-          Pay Only For<br />
-          <span className="italic" style={{ color: '#C9A84C' }}>Real Sales</span>
+      <section style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 72px', textAlign: 'center' }}>
+        <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 18 }}>For Brands</p>
+        <h1 className="display" style={{ fontSize: 'clamp(44px, 6vw, 72px)', fontWeight: 700, lineHeight: 1.1, color: '#1A1A1A', marginBottom: 22, letterSpacing: '-0.02em' }}>
+          Pay Only For<br /><em style={{ color: '#B8952A' }}>Real Sales</em>
         </h1>
-        <p className="font-body text-lg max-w-xl mx-auto mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Stop guessing if your influencer spend is working. Libaas gives you
-          complete attribution — every click, every order, every creator.
-          You only pay when a sale is confirmed.
+        <p style={{ fontSize: 17, color: '#6B6B6B', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7, fontWeight: 300 }}>
+          Stop guessing if your influencer spend is working. Complete attribution — every click, every order, every creator. You only pay when a sale is confirmed.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/auth?role=brand"
-            className="font-body px-8 py-4 rounded-full text-sm font-medium"
-            style={{ background: '#C9A84C', color: '#000' }}>
-            Claim a Founding Partner Slot →
-          </Link>
-          <Link href="/demo"
-            className="font-body px-8 py-4 rounded-full text-sm border border-white/20 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all">
-            See Creator Storefront
-          </Link>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link href="/auth?role=brand" className="btn-primary">Claim a Founding Partner Slot →</Link>
+          <Link href="/demo" className="btn-secondary">See Creator Storefront</Link>
         </div>
-        <p className="font-body text-xs mt-6" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          Only 3 founding partner slots available · Commission agreed per brand
-        </p>
+        <p style={{ fontSize: 12, color: '#C4C4C4', marginTop: 20 }}>Only 3 founding partner slots · Commission agreed per brand</p>
       </section>
+
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
 
       {/* HOW IT WORKS */}
-      <section className="border-t border-white/5 py-24 bg-[#0D0D0D]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="font-body text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: '#C9A84C' }}>The Process</p>
-            <h2 className="font-display text-5xl">How It Works</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {HOW.map(({ step, title, desc }) => (
-              <div key={step} className="card-hover bg-[#141414] border border-white/5 rounded-2xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px]"
-                  style={{ background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)', opacity: 0.3 }} />
-                <p className="font-display text-4xl mb-3" style={{ color: 'rgba(201,168,76,0.3)' }}>{step}</p>
-                <h3 className="font-body font-medium text-sm text-white mb-2">{title}</h3>
-                <p className="font-body text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{desc}</p>
-              </div>
-            ))}
-          </div>
+      <section style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>The Process</p>
+          <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>How It Works</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+          {HOW.map(({ step, title, desc }) => (
+            <div key={step} className="card">
+              <div className="step-num">{step}</div>
+              <h3 className="display" style={{ fontSize: 18, fontWeight: 600, marginBottom: 10 }}>{title}</h3>
+              <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
+
       {/* PRICING */}
-      <section className="border-t border-white/5 py-24">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-6">
-            <p className="font-body text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: '#C9A84C' }}>Pricing</p>
-            <h2 className="font-display text-5xl mb-4">Simple & Transparent</h2>
-            <p className="font-body text-sm max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Commission rates are agreed individually with each brand.
-              We split the total between the creator and our platform fee.
-              You always know exactly what you're paying and why.
+      <section style={{ background: '#FAFAFA', padding: '72px 24px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>Pricing</p>
+            <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em', marginBottom: 12 }}>Simple & Transparent</h2>
+            <p style={{ fontSize: 14, color: '#6B6B6B', maxWidth: 460, margin: '0 auto' }}>
+              Commission rates are agreed individually. We split the total between creator and platform fee.
             </p>
           </div>
 
           {/* Commission explainer */}
-          <div className="my-10 bg-[#141414] border border-white/5 rounded-2xl p-8">
-            <p className="font-body text-xs tracking-widest uppercase mb-6" style={{ color: '#C9A84C' }}>
-              How Commission Works
-            </p>
-            <div className="grid grid-cols-3 gap-4 text-center">
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #E8E8E8', padding: 32, margin: '32px 0' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 24 }}>How Commission Works</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, textAlign: 'center' }}>
               {[
-                { label: 'Total Commission', value: 'Agreed with you', sub: 'e.g. 13% of sale value', color: '#fff' },
-                { label: 'Creator Earns', value: 'Majority split', sub: 'e.g. 10% of sale value', color: '#C9A84C' },
-                { label: 'Libaas Fee', value: 'Small platform fee', sub: 'e.g. 3% of sale value', color: '#C9A84C' },
-              ].map(({ label, value, sub, color }) => (
-                <div key={label} className="bg-black/30 rounded-xl p-5">
-                  <p className="font-display text-2xl mb-1" style={{ color }}>{value}</p>
-                  <p className="font-body text-xs text-white font-medium mb-1">{label}</p>
-                  <p className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>{sub}</p>
+                { label: 'Total Commission', value: 'Agreed with you', sub: 'e.g. 13% of sale value' },
+                { label: 'Creator Earns', value: 'Majority split', sub: 'e.g. 10% of sale value' },
+                { label: 'Libaas Fee', value: 'Small fee', sub: 'e.g. 3% of sale value' },
+              ].map(({ label, value, sub }) => (
+                <div key={label} style={{ background: '#FAFAFA', borderRadius: 12, padding: '20px 16px' }}>
+                  <p className="display" style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>{value}</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>{label}</p>
+                  <p style={{ fontSize: 11, color: '#9B9B9B' }}>{sub}</p>
                 </div>
               ))}
             </div>
-            <p className="font-body text-xs mt-6 text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Exact rates agreed during onboarding. No hidden fees. No surprises.
-            </p>
+            <p style={{ fontSize: 11, color: '#C4C4C4', textAlign: 'center', marginTop: 20 }}>Exact rates agreed during onboarding. No hidden fees.</p>
           </div>
 
-          {/* Two tiers */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Tiers */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {/* Commission Only */}
-            <div className="rounded-2xl p-8 border" style={{ background: '#0D0D0D', borderColor: 'rgba(255,255,255,0.05)' }}>
-              <p className="font-body text-xs tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                Commission Only
-              </p>
-              <p className="font-display text-5xl text-white mb-1">PKR 0</p>
-              <p className="font-body text-xs mb-6" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                /month subscription — pay only on sales
-              </p>
-              <div className="space-y-3 mb-8">
-                {[
-                  'Pay commission only on confirmed sales',
-                  'Commission rate agreed with Libaas team',
-                  'Basic creator access',
-                  'Monthly sales report',
-                ].map(f => (
-                  <div key={f} className="flex items-center gap-2.5">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(201,168,76,0.15)' }}>
-                      <span style={{ color: '#C9A84C', fontSize: '9px' }}>✓</span>
-                    </div>
-                    <p className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{f}</p>
+            <div style={{ background: '#fff', border: '1px solid #E8E8E8', borderRadius: 16, padding: 32 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 16 }}>Commission Only</p>
+              <p className="display" style={{ fontSize: 48, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>PKR 0</p>
+              <p style={{ fontSize: 13, color: '#9B9B9B', marginBottom: 28 }}>/month · pay only on sales</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+                {['Pay commission only on confirmed sales', 'Commission rate agreed with Libaas team', 'Basic creator access', 'Monthly sales report'].map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <div className="check"><span>✓</span></div>
+                    <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.5 }}>{f}</p>
                   </div>
                 ))}
               </div>
-              <Link href="/auth?role=brand"
-                className="block w-full text-center font-body text-sm py-3.5 rounded-xl font-medium"
-                style={{ background: 'rgba(255,255,255,0.05)', color: '#fff' }}>
+              <Link href="/auth?role=brand" style={{ display: 'block', textAlign: 'center', background: '#F5F5F5', color: '#1A1A1A', borderRadius: 100, padding: '12px', fontSize: 14, fontWeight: 500, textDecoration: 'none', fontFamily: "'Inter', sans-serif", transition: 'background 0.2s' }}>
                 Get Started Free →
               </Link>
             </div>
 
             {/* Founding Partner */}
-            <div className="rounded-2xl p-8 border relative overflow-hidden"
-              style={{ background: '#141414', borderColor: '#C9A84C' }}>
-              <div className="absolute top-0 left-0 w-full h-[2px]" style={{ background: '#C9A84C' }} />
-              <span className="absolute top-4 right-4 font-body text-xs px-3 py-1 rounded-full"
-                style={{ background: 'rgba(201,168,76,0.15)', color: '#C9A84C' }}>
+            <div style={{ background: '#1A1A1A', border: '1px solid #1A1A1A', borderRadius: 16, padding: 32, position: 'relative', overflow: 'hidden' }}>
+              <span style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(212,175,80,0.2)', color: '#D4AF50', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
                 Only 3 slots
               </span>
-              <p className="font-body text-xs tracking-widest uppercase mb-3" style={{ color: '#C9A84C' }}>
-                Founding Partner
-              </p>
-              <p className="font-display text-5xl mb-1" style={{ color: '#C9A84C' }}>PKR 15,000</p>
-              <p className="font-body text-xs mb-6" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                /month · rate locked forever
-              </p>
-              <div className="space-y-3 mb-8">
-                {[
-                  'Everything in Commission Only',
-                  'Priority creator placement',
-                  'Real-time analytics dashboard',
-                  'Dedicated brand page on Libaas',
-                  'Direct creator communication',
-                  'Founding rate locked for life',
-                ].map(f => (
-                  <div key={f} className="flex items-center gap-2.5">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'rgba(201,168,76,0.15)' }}>
-                      <span style={{ color: '#C9A84C', fontSize: '9px' }}>✓</span>
-                    </div>
-                    <p className="font-body text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{f}</p>
+              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#D4AF50', marginBottom: 16 }}>Founding Partner</p>
+              <p className="display" style={{ fontSize: 48, fontWeight: 700, color: '#fff', marginBottom: 4 }}>PKR 15,000</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 28 }}>/month · rate locked forever</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 28 }}>
+                {['Everything in Commission Only', 'Priority creator placement', 'Real-time analytics dashboard', 'Dedicated brand page on Libaas', 'Direct creator communication', 'Founding rate locked for life'].map(f => (
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <div className="check check-gold"><span>✓</span></div>
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>{f}</p>
                   </div>
                 ))}
               </div>
-              <Link href="/auth?role=brand"
-                className="block w-full text-center font-body text-sm py-3.5 rounded-xl font-medium transition-opacity hover:opacity-90"
-                style={{ background: '#C9A84C', color: '#000' }}>
+              <Link href="/auth?role=brand" style={{ display: 'block', textAlign: 'center', background: '#D4AF50', color: '#1A1A1A', borderRadius: 100, padding: '12px', fontSize: 14, fontWeight: 600, textDecoration: 'none', fontFamily: "'Inter', sans-serif" }}>
                 Claim Your Slot →
               </Link>
             </div>
@@ -201,53 +159,44 @@ export default function PartnerPage() {
         </div>
       </section>
 
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
+
       {/* BENEFITS */}
-      <section className="border-t border-white/5 py-24 bg-[#0D0D0D]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="font-body text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: '#C9A84C' }}>Why Libaas</p>
-            <h2 className="font-display text-5xl">What You Get</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {BENEFITS.map(({ icon, title, desc }) => (
-              <div key={title} className="card-hover bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <span className="text-2xl mb-3 block">{icon}</span>
-                <h3 className="font-body font-medium text-sm text-white mb-2">{title}</h3>
-                <p className="font-body text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{desc}</p>
-              </div>
-            ))}
-          </div>
+      <section style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>Why Libaas</p>
+          <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>What You Get</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          {BENEFITS.map(({ title, desc }) => (
+            <div key={title} className="card">
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 8 }}>{title}</h3>
+              <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/5 py-24 text-center">
-        <div className="max-w-2xl mx-auto px-6">
-          <h2 className="font-display text-6xl mb-6">
-            Ready to Partner<br />
-            <span className="italic" style={{ color: '#C9A84C' }}>With Us?</span>
-          </h2>
-          <p className="font-body mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Only 3 founding brand partner slots available.
-            Sign up now to claim yours before we open to the public.
-          </p>
-          <Link href="/auth?role=brand"
-            className="inline-block font-body px-10 py-4 rounded-full text-sm font-medium"
-            style={{ background: '#C9A84C', color: '#000' }}>
-            Become a Partner →
-          </Link>
-        </div>
+      <section style={{ background: '#1A1A1A', padding: '72px 24px', textAlign: 'center' }}>
+        <h2 className="display" style={{ fontSize: 52, fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '-0.02em' }}>
+          Ready to Partner<br /><em style={{ color: '#D4AF50' }}>With Us?</em>
+        </h2>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.4)', marginBottom: 36, fontWeight: 300 }}>
+          Only 3 founding brand partner slots available.
+        </p>
+        <Link href="/auth?role=brand" style={{ background: '#D4AF50', color: '#1A1A1A', borderRadius: 100, padding: '13px 36px', fontSize: 14, fontWeight: 600, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
+          Become a Partner →
+        </Link>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-8">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-          <a href="mailto:hello@thelibaas.pk"
-            className="font-body text-xs hover:text-[#C9A84C] transition-colors"
-            style={{ color: 'rgba(255,255,255,0.3)' }}>
-            hello@thelibaas.pk
-          </a>
+      <footer style={{ borderTop: '1px solid #F0F0F0', padding: '24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <a href="mailto:hello@thelibaas.pk" style={{ fontSize: 12, color: '#9B9B9B', textDecoration: 'none' }}>hello@thelibaas.pk</a>
         </div>
       </footer>
     </main>

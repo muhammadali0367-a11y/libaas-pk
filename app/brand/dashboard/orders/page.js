@@ -4,6 +4,26 @@ import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAFA; }
+  .order-card { background: #fff; border-radius: 14px; border: 1px solid #F0F0F0; padding: 20px; transition: all 0.2s; }
+  .order-card:hover { border-color: #E0E0E0; }
+  .tab { padding: 8px 18px; border-radius: 100px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+  .tab-active { background: #1A1A1A; color: #fff; }
+  .tab-inactive { background: transparent; color: #9B9B9B; }
+  .badge { display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 500; }
+  .badge-green { background: rgba(22,163,74,0.1); color: #16a34a; }
+  .badge-amber { background: rgba(184,149,42,0.12); color: #92700A; }
+  .badge-red { background: rgba(220,38,38,0.1); color: #DC2626; }
+  .btn-confirm { background: rgba(22,163,74,0.1); color: #16a34a; border: 1px solid rgba(22,163,74,0.2); border-radius: 100px; padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+  .btn-confirm:hover { background: rgba(22,163,74,0.18); }
+  .btn-reject { background: rgba(220,38,38,0.08); color: #DC2626; border: 1px solid rgba(220,38,38,0.15); border-radius: 100px; padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+  .btn-reject:hover { background: rgba(220,38,38,0.14); }
+`
+
 export default function BrandOrders() {
   const [brand, setBrand] = useState(null)
   const [orders, setOrders] = useState([])
@@ -16,26 +36,10 @@ export default function BrandOrders() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth'); return }
-
-      const { data: brandData } = await supabase
-        .from('brands')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-
+      const { data: brandData } = await supabase.from('brands').select('*').eq('user_id', user.id).single()
       if (!brandData) { router.push('/auth'); return }
       setBrand(brandData)
-
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          creators ( full_name, username, avatar_url, jazzcash_number ),
-          affiliate_links ( slug, products ( name, image_url, price ) )
-        `)
-        .eq('brand_id', brandData.id)
-        .order('created_at', { ascending: false })
-
+      const { data: ordersData } = await supabase.from('orders').select(`*, creators(full_name, username, avatar_url, jazzcash_number), affiliate_links(slug, products(name, image_url, price))`).eq('brand_id', brandData.id).order('created_at', { ascending: false })
       setOrders(ordersData || [])
       setLoading(false)
     }
@@ -44,19 +48,8 @@ export default function BrandOrders() {
 
   async function updateOrderStatus(orderId, status) {
     setProcessing(orderId)
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        status,
-        confirmed_at: status === 'confirmed' ? new Date().toISOString() : null,
-      })
-      .eq('id', orderId)
-
-    if (!error) {
-      setOrders(prev => prev.map(o =>
-        o.id === orderId ? { ...o, status } : o
-      ))
-    }
+    const { error } = await supabase.from('orders').update({ status, confirmed_at: status === 'confirmed' ? new Date().toISOString() : null }).eq('id', orderId)
+    if (!error) setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
     setProcessing(null)
   }
 
@@ -64,160 +57,108 @@ export default function BrandOrders() {
   const pending = orders.filter(o => o.status === 'pending').length
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-      <p style={{ fontFamily: "'DM Sans', sans-serif", color: '#C9A84C', fontSize: '14px' }}>Loading...</p>
+    <div style={{ minHeight: '100vh', background: '#FAFAFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#9B9B9B' }}>Loading...</p>
     </div>
   )
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-      `}</style>
+    <main style={{ minHeight: '100vh', background: '#FAFAFA', fontFamily: "'Inter', sans-serif" }}>
+      <style>{S}</style>
 
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <Link href="/brand/dashboard" className="font-body text-xs text-white/40 hover:text-white transition-colors">
-          ← Dashboard
-        </Link>
+      <nav style={{ background: '#fff', borderBottom: '1px solid #F0F0F0', padding: '0 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/brand/dashboard" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <Link href="/brand/dashboard" style={{ fontSize: 13, color: '#6B6B6B', textDecoration: 'none' }}>← Dashboard</Link>
+        </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between mb-8">
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
-            <p className="font-body text-xs tracking-widest text-white/30 uppercase mb-1">Brand Tools</p>
-            <h1 className="font-display text-4xl">Confirm Orders</h1>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 8 }}>Brand Tools</p>
+            <h1 className="display" style={{ fontSize: 36, fontWeight: 700, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Confirm Orders</h1>
           </div>
           {pending > 0 && (
-            <div className="text-center px-5 py-3 rounded-2xl"
-              style={{ background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)' }}>
-              <p className="font-display text-3xl" style={{ color: '#C9A84C' }}>{pending}</p>
-              <p className="font-body text-xs text-white/40">Pending</p>
+            <div style={{ background: '#FBF8F1', border: '1px solid #E8D5A0', borderRadius: 14, padding: '16px 24px', textAlign: 'center' }}>
+              <p className="display" style={{ fontSize: 36, fontWeight: 700, color: '#B8952A' }}>{pending}</p>
+              <p style={{ fontSize: 11, color: '#92700A', fontWeight: 500 }}>Pending</p>
             </div>
           )}
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2 mb-6 bg-[#141414] rounded-xl p-1 w-fit">
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, background: '#F5F5F5', padding: 4, borderRadius: 100, width: 'fit-content' }}>
           {['all', 'pending', 'confirmed', 'rejected'].map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className="font-body text-xs px-4 py-2 rounded-lg transition-all capitalize"
-              style={{
-                background: filter === f ? '#C9A84C' : 'transparent',
-                color: filter === f ? '#000' : '#666',
-              }}>
+            <button key={f} onClick={() => setFilter(f)} className={`tab ${filter === f ? 'tab-active' : 'tab-inactive'}`} style={{ textTransform: 'capitalize' }}>
               {f} {f !== 'all' && `(${orders.filter(o => o.status === f).length})`}
             </button>
           ))}
         </div>
 
         {filtered.length === 0 ? (
-          <div className="bg-[#141414] border border-white/5 rounded-2xl p-16 text-center">
-            <p className="font-display text-3xl text-white/20 mb-2">No orders</p>
-            <p className="font-body text-sm text-white/20">
-              {filter === 'pending' ? 'No pending orders to confirm' : 'No orders found'}
-            </p>
+          <div style={{ background: '#fff', border: '1px solid #F0F0F0', borderRadius: 16, padding: 60, textAlign: 'center' }}>
+            <p className="display" style={{ fontSize: 26, color: '#C4C4C4', marginBottom: 8 }}>No orders</p>
+            <p style={{ fontSize: 14, color: '#9B9B9B' }}>{filter === 'pending' ? 'No pending orders to confirm' : 'No orders found'}</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {filtered.map(order => (
-              <div key={order.id}
-                className="bg-[#141414] border border-white/5 rounded-2xl p-5">
-                <div className="flex items-start gap-4">
-
+              <div key={order.id} className="order-card">
+                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                   {/* Product image */}
-                  <div className="w-16 h-20 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
-                    {order.affiliate_links?.products?.image_url && (
-                      <img
-                        src={order.affiliate_links.products.image_url}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    )}
+                  <div style={{ width: 64, height: 80, borderRadius: 12, overflow: 'hidden', background: '#F5F5F5', flexShrink: 0 }}>
+                    {order.affiliate_links?.products?.image_url && <img src={order.affiliate_links.products.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                   </div>
 
-                  {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4 mb-3">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                       <div>
-                        <p className="font-body font-medium text-white mb-0.5">
-                          {order.affiliate_links?.products?.name || 'Product'}
-                        </p>
-                        <p className="font-body text-xs text-white/30">
-                          {new Date(order.created_at).toLocaleDateString('en-PK', {
-                            year: 'numeric', month: 'short', day: 'numeric'
-                          })}
-                        </p>
+                        <p style={{ fontSize: 15, fontWeight: 600, color: '#1A1A1A', marginBottom: 2 }}>{order.affiliate_links?.products?.name || 'Product'}</p>
+                        <p style={{ fontSize: 12, color: '#9B9B9B' }}>{new Date(order.created_at).toLocaleDateString('en-PK', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
                       </div>
-                      <span className="flex-shrink-0 font-body text-xs px-3 py-1 rounded-full"
-                        style={{
-                          background: order.status === 'confirmed' ? 'rgba(76,175,130,0.1)' : order.status === 'rejected' ? 'rgba(255,80,80,0.1)' : 'rgba(201,168,76,0.1)',
-                          color: order.status === 'confirmed' ? '#4CAF82' : order.status === 'rejected' ? '#ff5050' : '#C9A84C',
-                        }}>
+                      <span className={`badge ${order.status === 'confirmed' ? 'badge-green' : order.status === 'rejected' ? 'badge-red' : 'badge-amber'}`}>
                         {order.status === 'confirmed' ? '✓ Confirmed' : order.status === 'rejected' ? '✕ Rejected' : '⏳ Pending'}
                       </span>
                     </div>
 
-                    {/* Creator info */}
-                    <div className="flex items-center gap-2 mb-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                      <div className="w-7 h-7 rounded-full overflow-hidden bg-white/5">
-                        {order.creators?.avatar_url
-                          ? <img src={order.creators.avatar_url} alt="" className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-xs">👤</div>
-                        }
+                    {/* Creator */}
+                    <div style={{ background: '#FAFAFA', borderRadius: 10, padding: '12px 16px', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', overflow: 'hidden', background: '#F0F0F0', flexShrink: 0 }}>
+                        {order.creators?.avatar_url ? <img src={order.creators.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👤</div>}
                       </div>
                       <div>
-                        <p className="font-body text-xs text-white">
-                          {order.creators?.full_name || order.creators?.username}
-                        </p>
-                        <p className="font-body text-xs text-white/30">
-                          libaas.pk/{order.creators?.username}
-                          {order.creators?.jazzcash_number && ` · JazzCash: ${order.creators.jazzcash_number}`}
-                        </p>
+                        <p style={{ fontSize: 13, fontWeight: 500, color: '#1A1A1A' }}>{order.creators?.full_name || order.creators?.username}</p>
+                        <p style={{ fontSize: 11, color: '#9B9B9B' }}>libaas.pk/{order.creators?.username}{order.creators?.jazzcash_number && ` · JazzCash: ${order.creators.jazzcash_number}`}</p>
                       </div>
                     </div>
 
-                    {/* Financial breakdown */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                      {[
-                        { label: 'Order Amount', value: `PKR ${order.order_amount?.toLocaleString()}` },
-                        { label: 'Commission', value: `PKR ${order.commission_amount?.toLocaleString()}` },
-                        { label: 'Rate', value: `${order.commission_rate}%` },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="text-center p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                          <p className="font-body text-xs text-white/30 mb-0.5">{label}</p>
-                          <p className="font-body text-sm text-white font-medium">{value}</p>
+                    {/* Financials */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
+                      {[{ label: 'Order Amount', value: `PKR ${order.order_amount?.toLocaleString()}` }, { label: 'Commission', value: `PKR ${order.commission_amount?.toLocaleString()}` }, { label: 'Rate', value: `${order.commission_rate}%` }].map(({ label, value }) => (
+                        <div key={label} style={{ background: '#FAFAFA', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
+                          <p style={{ fontSize: 11, color: '#9B9B9B', marginBottom: 4 }}>{label}</p>
+                          <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{value}</p>
                         </div>
                       ))}
                     </div>
 
-                    {/* Action buttons */}
+                    {/* Actions */}
                     {order.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => updateOrderStatus(order.id, 'confirmed')}
-                          disabled={processing === order.id}
-                          className="flex-1 py-2.5 rounded-xl font-body text-sm font-medium transition-opacity disabled:opacity-50"
-                          style={{ background: 'rgba(76,175,130,0.15)', color: '#4CAF82', border: '1px solid rgba(76,175,130,0.2)' }}>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <button onClick={() => updateOrderStatus(order.id, 'confirmed')} disabled={processing === order.id} className="btn-confirm" style={{ flex: 1, opacity: processing === order.id ? 0.5 : 1 }}>
                           {processing === order.id ? 'Processing...' : '✓ Confirm Order'}
                         </button>
-                        <button
-                          onClick={() => updateOrderStatus(order.id, 'rejected')}
-                          disabled={processing === order.id}
-                          className="flex-1 py-2.5 rounded-xl font-body text-sm font-medium transition-opacity disabled:opacity-50"
-                          style={{ background: 'rgba(255,80,80,0.1)', color: '#ff5050', border: '1px solid rgba(255,80,80,0.15)' }}>
+                        <button onClick={() => updateOrderStatus(order.id, 'rejected')} disabled={processing === order.id} className="btn-reject" style={{ flex: 1, opacity: processing === order.id ? 0.5 : 1 }}>
                           ✕ Reject
                         </button>
                       </div>
                     )}
-
                     {order.status !== 'pending' && (
-                      <button
-                        onClick={() => updateOrderStatus(order.id, 'pending')}
-                        disabled={processing === order.id}
-                        className="font-body text-xs text-white/20 hover:text-white/40 transition-colors">
+                      <button onClick={() => updateOrderStatus(order.id, 'pending')} disabled={processing === order.id}
+                        style={{ background: 'none', border: 'none', fontSize: 12, color: '#9B9B9B', cursor: 'pointer', fontFamily: "'Inter', sans-serif" }}>
                         ↩ Revert to pending
                       </button>
                     )}

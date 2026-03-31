@@ -4,17 +4,36 @@ import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAFA; }
+  .product-card { background: #fff; border-radius: 14px; overflow: hidden; border: 1px solid #F0F0F0; transition: all 0.2s; }
+  .product-card:hover { border-color: #E0E0E0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transform: translateY(-1px); }
+  .tab { padding: 8px 20px; border-radius: 100px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+  .tab-active { background: #1A1A1A; color: #fff; }
+  .tab-inactive { background: transparent; color: #9B9B9B; }
+  .pill { border-radius: 100px; padding: 6px 14px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid #E8E8E8; background: #fff; color: #6B6B6B; transition: all 0.18s; font-family: 'Inter', sans-serif; }
+  .pill-active { background: #1A1A1A !important; color: #fff !important; border-color: #1A1A1A !important; }
+  .pill:hover { border-color: #C4C4C4; color: #1A1A1A; }
+  .search-input { background: #fff; border: 1px solid #E8E8E8; border-radius: 10px; padding: 10px 16px; font-size: 14px; color: #1A1A1A; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; width: 260px; }
+  .search-input:focus { border-color: #1A1A1A; }
+  .search-input::placeholder { color: #C4C4C4; }
+  .nav-link { font-size: 13px; color: #6B6B6B; text-decoration: none; }
+`
+
 export default function StorefrontManager() {
   const [creator, setCreator] = useState(null)
   const [allProducts, setAllProducts] = useState([])
-  const [myProducts, setMyProducts] = useState([])
+  const [myProducts, setMyProducts] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterBrand, setFilterBrand] = useState('All')
   const [filterCategory, setFilterCategory] = useState('All')
   const [adding, setAdding] = useState(null)
   const [removing, setRemoving] = useState(null)
-  const [tab, setTab] = useState('browse') // 'browse' | 'my'
+  const [tab, setTab] = useState('browse')
   const router = useRouter()
 
   const brands = ['All', 'Beechtree', 'Saya', 'Asim Jofa', 'Limelight', 'Alkaram', 'Ethnic', 'Zellbury', 'Bonanza', 'Baroque', 'Stylo']
@@ -24,32 +43,13 @@ export default function StorefrontManager() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth'); return }
-
-      const { data: creatorData } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
+      const { data: creatorData } = await supabase.from('creators').select('*').eq('user_id', user.id).single()
       if (!creatorData) { router.push('/auth'); return }
       setCreator(creatorData)
-
-      // Load all products with brand info
-      const { data: products } = await supabase
-        .from('products')
-        .select('*, brands(name, commission_rate)')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
-
-      // Load my storefront
-      const { data: storefront } = await supabase
-        .from('storefronts')
-        .select('product_id')
-        .eq('creator_id', creatorData.id)
-
-      const myProductIds = new Set(storefront?.map(s => s.product_id) || [])
-
+      const { data: products } = await supabase.from('products').select('*, brands(name, commission_rate)').eq('is_active', true).order('created_at', { ascending: false })
+      const { data: storefront } = await supabase.from('storefronts').select('product_id').eq('creator_id', creatorData.id)
       setAllProducts(products || [])
-      setMyProducts(myProductIds)
+      setMyProducts(new Set(storefront?.map(s => s.product_id) || []))
       setLoading(false)
     }
     load()
@@ -57,18 +57,10 @@ export default function StorefrontManager() {
 
   async function addProduct(productId) {
     setAdding(productId)
-    const { error } = await supabase
-      .from('storefronts')
-      .insert({ creator_id: creator.id, product_id: productId })
-
+    const { error } = await supabase.from('storefronts').insert({ creator_id: creator.id, product_id: productId })
     if (!error) {
-      // Also create affiliate link
       const slug = `${creator.username}-${productId.slice(0, 8)}`
-      await supabase.from('affiliate_links').insert({
-        creator_id: creator.id,
-        product_id: productId,
-        slug,
-      })
+      await supabase.from('affiliate_links').insert({ creator_id: creator.id, product_id: productId, slug })
       setMyProducts(prev => new Set([...prev, productId]))
     }
     setAdding(null)
@@ -76,23 +68,9 @@ export default function StorefrontManager() {
 
   async function removeProduct(productId) {
     setRemoving(productId)
-    await supabase
-      .from('storefronts')
-      .delete()
-      .eq('creator_id', creator.id)
-      .eq('product_id', productId)
-
-    await supabase
-      .from('affiliate_links')
-      .delete()
-      .eq('creator_id', creator.id)
-      .eq('product_id', productId)
-
-    setMyProducts(prev => {
-      const next = new Set(prev)
-      next.delete(productId)
-      return next
-    })
+    await supabase.from('storefronts').delete().eq('creator_id', creator.id).eq('product_id', productId)
+    await supabase.from('affiliate_links').delete().eq('creator_id', creator.id).eq('product_id', productId)
+    setMyProducts(prev => { const next = new Set(prev); next.delete(productId); return next })
     setRemoving(null)
   }
 
@@ -102,178 +80,105 @@ export default function StorefrontManager() {
     const matchCat = filterCategory === 'All' || p.category === filterCategory
     return matchSearch && matchBrand && matchCat
   })
-
-  const displayProducts = tab === 'my'
-    ? filtered.filter(p => myProducts.has(p.id))
-    : filtered
+  const displayProducts = tab === 'my' ? filtered.filter(p => myProducts.has(p.id)) : filtered
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-      <p style={{ fontFamily: "'DM Sans', sans-serif", color: '#C9A84C', fontSize: '14px' }}>Loading...</p>
+    <div style={{ minHeight: '100vh', background: '#FAFAFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#9B9B9B' }}>Loading...</p>
     </div>
   )
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-        input, select { font-family: 'DM Sans', sans-serif; }
-        .product-card { transition: all 0.2s ease; }
-        .product-card:hover { transform: translateY(-2px); }
-        .pill { transition: all 0.2s ease; cursor: pointer; }
-      `}</style>
+    <main style={{ minHeight: '100vh', background: '#FAFAFA', fontFamily: "'Inter', sans-serif" }}>
+      <style>{S}</style>
 
-      {/* NAV */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between sticky top-0 bg-[#0A0A0A] z-10">
-        <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <div className="flex items-center gap-4">
-          <Link href={`/${creator.username}`} target="_blank"
-            className="font-body text-xs text-white/40 hover:text-white transition-colors">
-            View Storefront →
+      <nav style={{ background: '#fff', borderBottom: '1px solid #F0F0F0', padding: '0 24px', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 20, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
           </Link>
-          <Link href="/dashboard"
-            className="font-body text-xs text-white/40 hover:text-white transition-colors">
-            ← Dashboard
-          </Link>
+          <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+            <Link href={`/${creator.username}`} className="nav-link" target="_blank">View Storefront ↗</Link>
+            <Link href="/dashboard" className="nav-link">← Dashboard</Link>
+          </div>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
-
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '36px 24px' }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
           <div>
-            <p className="font-body text-xs tracking-widest text-white/30 uppercase mb-1">Creator Tools</p>
-            <h1 className="font-display text-4xl">Manage Storefront</h1>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 6 }}>Creator Tools</p>
+            <h1 className="display" style={{ fontSize: 36, fontWeight: 700, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Manage Storefront</h1>
           </div>
-          <div className="text-right">
-            <p className="font-display text-3xl" style={{ color: '#C9A84C' }}>{myProducts.size}</p>
-            <p className="font-body text-xs text-white/30 uppercase tracking-widest">Products Added</p>
+          <div style={{ textAlign: 'right' }}>
+            <p className="display" style={{ fontSize: 40, fontWeight: 700, color: '#1A1A1A', letterSpacing: '-0.02em' }}>{myProducts.size}</p>
+            <p style={{ fontSize: 11, color: '#9B9B9B', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500 }}>Products Added</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 bg-[#141414] rounded-xl p-1 w-fit">
-          {[
-            { key: 'browse', label: '🛍️ Browse All' },
-            { key: 'my', label: `✨ My Picks (${myProducts.size})` },
-          ].map(({ key, label }) => (
-            <button key={key} onClick={() => setTab(key)}
-              className="font-body text-xs px-5 py-2.5 rounded-lg transition-all"
-              style={{
-                background: tab === key ? '#C9A84C' : 'transparent',
-                color: tab === key ? '#000' : '#666',
-              }}>
-              {label}
-            </button>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: '#F5F5F5', padding: 4, borderRadius: 100, width: 'fit-content' }}>
+          {[{ key: 'browse', label: 'Browse All' }, { key: 'my', label: `My Picks (${myProducts.size})` }].map(({ key, label }) => (
+            <button key={key} onClick={() => setTab(key)} className={`tab ${tab === key ? 'tab-active' : 'tab-inactive'}`}>{label}</button>
           ))}
         </div>
 
-        {/* Search + Filters */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search products..."
-            className="bg-[#141414] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#C9A84C] transition-colors w-64"
-          />
-
-          {/* Brand filter */}
-          <div className="flex gap-2 flex-wrap">
+        {/* Filters */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16, alignItems: 'center' }}>
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="search-input" />
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {brands.map(b => (
-              <button key={b} onClick={() => setFilterBrand(b)}
-                className="pill font-body text-xs px-3 py-2 rounded-full border"
-                style={{
-                  borderColor: filterBrand === b ? '#C9A84C' : '#333',
-                  color: filterBrand === b ? '#C9A84C' : '#666',
-                  background: filterBrand === b ? 'rgba(201,168,76,0.08)' : 'transparent',
-                }}>
-                {b}
-              </button>
+              <button key={b} onClick={() => setFilterBrand(b)} className={`pill ${filterBrand === b ? 'pill-active' : ''}`}>{b}</button>
             ))}
           </div>
         </div>
-
-        {/* Category filter */}
-        <div className="flex gap-2 mb-8 flex-wrap">
+        <div style={{ display: 'flex', gap: 6, marginBottom: 24, flexWrap: 'wrap' }}>
           {categories.map(c => (
-            <button key={c} onClick={() => setFilterCategory(c)}
-              className="pill font-body text-xs px-3 py-2 rounded-full border"
-              style={{
-                borderColor: filterCategory === c ? '#C9A84C' : '#222',
-                color: filterCategory === c ? '#C9A84C' : '#555',
-                background: filterCategory === c ? 'rgba(201,168,76,0.08)' : 'transparent',
-              }}>
-              {c}
-            </button>
+            <button key={c} onClick={() => setFilterCategory(c)} className={`pill ${filterCategory === c ? 'pill-active' : ''}`}>{c}</button>
           ))}
         </div>
 
-        {/* Products Grid */}
+        {/* Grid */}
         {displayProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="font-display text-3xl text-white/20 mb-2">No products found</p>
-            <p className="font-body text-sm text-white/20">Try a different filter or search term</p>
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <p className="display" style={{ fontSize: 28, color: '#C4C4C4', marginBottom: 8 }}>No products found</p>
+            <p style={{ fontSize: 14, color: '#9B9B9B' }}>Try a different filter or search term</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16 }}>
             {displayProducts.map(product => {
               const isAdded = myProducts.has(product.id)
               const isAdding = adding === product.id
               const isRemoving = removing === product.id
-
               return (
-                <div key={product.id}
-                  className="product-card bg-[#141414] rounded-2xl overflow-hidden border border-white/5">
-
-                  {/* Image */}
-                  <div className="relative aspect-[3/4] overflow-hidden bg-white/5">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                      onError={e => { e.target.src = 'https://via.placeholder.com/300x400/141414/333?text=No+Image' }}
-                    />
-                    {/* Added badge */}
+                <div key={product.id} className="product-card">
+                  <div style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden', background: '#F5F5F5' }}>
+                    <img src={product.image_url} alt={product.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={e => { e.target.src = 'https://via.placeholder.com/300x400/F5F5F5/C4C4C4?text=No+Image' }} />
                     {isAdded && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs"
-                        style={{ background: '#C9A84C', color: '#000' }}>
-                        ✓
-                      </div>
+                      <div style={{ position: 'absolute', top: 10, right: 10, width: 24, height: 24, background: '#1A1A1A', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#fff' }}>✓</div>
                     )}
-                    {/* Brand badge */}
-                    <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(0,0,0,0.7)', color: '#C9A84C', fontSize: '9px', fontFamily: "'DM Sans', sans-serif" }}>
+                    <span style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(255,255,255,0.9)', color: '#6B6B6B', borderRadius: 100, padding: '3px 8px', fontSize: 10, fontWeight: 500 }}>
                       {product.brands?.name}
                     </span>
                   </div>
-
-                  {/* Info */}
-                  <div className="p-3">
-                    <p className="font-body text-xs font-medium text-white truncate mb-1">
-                      {product.name}
-                    </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <p className="font-body text-xs" style={{ color: '#C9A84C' }}>
-                        PKR {product.price?.toLocaleString()}
-                      </p>
-                      <p className="font-body text-xs text-white/30">
-                        {product.brands?.commission_rate}% comm
-                      </p>
+                  <div style={{ padding: 12 }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1A1A1A', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <p style={{ fontSize: 12, color: '#B8952A', fontWeight: 500 }}>PKR {product.price?.toLocaleString()}</p>
+                      <p style={{ fontSize: 11, color: '#9B9B9B' }}>{product.brands?.commission_rate}%</p>
                     </div>
-
-                    {/* Add/Remove button */}
-                    <button
-                      onClick={() => isAdded ? removeProduct(product.id) : addProduct(product.id)}
+                    <button onClick={() => isAdded ? removeProduct(product.id) : addProduct(product.id)}
                       disabled={isAdding || isRemoving}
-                      className="w-full py-2 rounded-xl text-xs font-body font-medium transition-all disabled:opacity-50"
                       style={{
-                        background: isAdded ? 'rgba(255,80,80,0.1)' : 'rgba(201,168,76,0.1)',
-                        color: isAdded ? '#ff5050' : '#C9A84C',
-                        border: `1px solid ${isAdded ? 'rgba(255,80,80,0.2)' : 'rgba(201,168,76,0.2)'}`,
+                        width: '100%', padding: '8px', borderRadius: 100, fontSize: 12, fontWeight: 500, cursor: 'pointer', border: 'none',
+                        background: isAdded ? '#FEF2F2' : '#F5F5F5',
+                        color: isAdded ? '#DC2626' : '#1A1A1A',
+                        fontFamily: "'Inter', sans-serif",
+                        opacity: (isAdding || isRemoving) ? 0.5 : 1,
+                        transition: 'all 0.2s',
                       }}>
                       {isAdding ? 'Adding...' : isRemoving ? 'Removing...' : isAdded ? '− Remove' : '+ Add to Shop'}
                     </button>

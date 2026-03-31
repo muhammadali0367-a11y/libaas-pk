@@ -1,165 +1,151 @@
 import Link from 'next/link'
 
 const BENEFITS = [
-  { icon: '🛍️', title: 'Your Own Storefront', desc: 'A beautiful shop page at libaas.pk/yourname — curated by you, for your audience.' },
-  { icon: '💰', title: 'Earn in PKR', desc: 'Earn commission on every sale you drive — paid directly to JazzCash or your bank account monthly.' },
-  { icon: '📊', title: 'Real-Time Analytics', desc: 'See your clicks, orders, and earnings live in your dashboard.' },
-  { icon: '🤝', title: 'Top Pakistani Brands', desc: 'Access to Saya, Beechtree, Baroque, Limelight and more from day one.' },
-  { icon: '🚫', title: 'No Follower Minimum', desc: 'We care about engagement and taste — not follower count.' },
-  { icon: '⚡', title: 'Free Forever', desc: 'No subscription fees. Ever. We only earn when you earn.' },
+  { title: 'Your Own Storefront', desc: 'A beautiful shop page at libaas.pk/yourname — curated by you, for your audience.' },
+  { title: 'Earn in PKR', desc: 'Earn commission on every sale — paid directly to JazzCash or your bank account monthly.' },
+  { title: 'Real-Time Analytics', desc: 'See your clicks, orders, and earnings live in your dashboard.' },
+  { title: 'Top Pakistani Brands', desc: 'Access to Saya, Beechtree, Baroque, Limelight and more from day one.' },
+  { title: 'No Follower Minimum', desc: 'We care about engagement and taste — not follower count.' },
+  { title: 'Free Forever', desc: 'No subscription fees. Ever. We only earn when you earn.' },
 ]
 
 const STEPS = [
-  { number: '01', title: 'Sign Up', desc: 'Create your free creator account in under 2 minutes.' },
+  { number: '01', title: 'Sign Up Free', desc: 'Create your creator account in under 2 minutes. No approval needed.' },
   { number: '02', title: 'Build Your Shop', desc: 'Browse our brand catalog and add products you genuinely love.' },
   { number: '03', title: 'Share & Earn', desc: 'Share libaas.pk/yourname with your audience and earn on every sale.' },
 ]
 
 const FAQS = [
-  { q: 'How much can I earn?', a: 'Creators earn commission on every sale driven through their storefront. Commission rates vary by brand. The more you share, the more you earn.' },
+  { q: 'How much can I earn?', a: 'Creators earn commission on every sale driven through their storefront. Commission rates vary by brand — typically 10-12% per sale.' },
   { q: 'When do I get paid?', a: 'Payouts are processed monthly via JazzCash or bank transfer once your earnings exceed PKR 1,000.' },
   { q: 'Do I need a minimum number of followers?', a: 'No minimum at all. We care about how engaged your audience is, not how big it is.' },
-  { q: 'Which brands are available?', a: 'We currently have Saya, Beechtree, Asim Jofa, Limelight, Alkaram, Ethnic, Zellbury, Bonanza, Baroque and Stylo — with more brands joining every week.' },
+  { q: 'Which brands are available?', a: 'Saya, Beechtree, Asim Jofa, Limelight, Alkaram, Ethnic, Zellbury, Bonanza, Baroque and Stylo — with more brands joining every week.' },
   { q: 'Is it really free?', a: 'Yes — completely free for creators. We take a small platform fee from the brand side only.' },
-  { q: 'How do I get paid?', a: 'Once a brand confirms a sale driven by your storefront, your earnings are added to your balance. We pay out monthly via JazzCash or bank transfer.' },
 ]
+
+const S = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+  * { box-sizing: border-box; }
+  .display { font-family: 'Playfair Display', Georgia, serif; }
+  .nav-link { font-size: 13px; color: #6B6B6B; text-decoration: none; transition: color 0.2s; }
+  .nav-link:hover { color: #1A1A1A; }
+  .btn-primary { background: #1A1A1A; color: #fff; border: none; border-radius: 100px; padding: 13px 28px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-secondary { background: transparent; color: #1A1A1A; border: 1.5px solid #E8E8E8; border-radius: 100px; padding: 12px 28px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-secondary:hover { border-color: #1A1A1A; }
+  .card { background: #FAFAFA; border-radius: 14px; border: 1px solid #F0F0F0; padding: 24px; transition: all 0.2s; }
+  .card:hover { border-color: #E0E0E0; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .faq-card { background: #fff; border-radius: 14px; border: 1px solid #F0F0F0; padding: 24px; }
+  .step-num { font-family: 'Playfair Display', Georgia, serif; font-size: 40px; font-weight: 700; color: #F0F0F0; line-height: 1; margin-bottom: 14px; }
+`
 
 export default function JoinPage() {
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Cormorant Garamond', serif; }
-        .font-body { font-family: 'DM Sans', sans-serif; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .animate-in { animation: fadeUp 0.7s ease forwards; }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); border-color: rgba(201,168,76,0.3) !important; }
-      `}</style>
+    <main style={{ fontFamily: "'Inter', sans-serif", background: '#fff', color: '#1A1A1A' }}>
+      <style>{S}</style>
 
       {/* NAV */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-        <Link href="/auth"
-          className="font-body text-xs px-5 py-2.5 rounded-full"
-          style={{ background: '#C9A84C', color: '#000' }}>
-          Sign Up Free
-        </Link>
+      <nav style={{ borderBottom: '1px solid #F0F0F0', padding: '0 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 22, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <Link href="/auth" className="btn-primary" style={{ padding: '9px 20px', fontSize: 13 }}>Sign Up Free</Link>
+        </div>
       </nav>
 
       {/* HERO */}
-      <section className="max-w-4xl mx-auto px-6 pt-24 pb-20 text-center animate-in">
-        <p className="font-body text-xs tracking-[0.3em] mb-6 uppercase" style={{ color: '#C9A84C' }}>
-          For Creators
-        </p>
-        <h1 className="font-display text-6xl md:text-8xl leading-[0.9] mb-8">
-          Turn Your Taste<br />
-          <span className="italic" style={{ color: '#C9A84C' }}>Into Income</span>
+      <section style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 72px', textAlign: 'center' }}>
+        <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 18 }}>For Creators</p>
+        <h1 className="display" style={{ fontSize: 'clamp(44px, 6vw, 72px)', fontWeight: 700, lineHeight: 1.1, color: '#1A1A1A', marginBottom: 22, letterSpacing: '-0.02em' }}>
+          Turn Your Taste<br /><em style={{ color: '#B8952A' }}>Into Income</em>
         </h1>
-        <p className="font-body text-lg max-w-xl mx-auto mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          Build your personal Pakistani fashion storefront. Curate products from top brands.
-          Earn commission on every sale — paid in PKR, directly to your account.
+        <p style={{ fontSize: 17, color: '#6B6B6B', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7, fontWeight: 300 }}>
+          Build your personal Pakistani fashion storefront. Earn commission on every sale — paid in PKR.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/auth"
-            className="font-body px-8 py-4 rounded-full text-sm font-medium"
-            style={{ background: '#C9A84C', color: '#000' }}>
-            Create Your Free Storefront →
-          </Link>
-          <Link href="/demo"
-            className="font-body px-8 py-4 rounded-full text-sm border border-white/20 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all">
-            See Demo Storefront
-          </Link>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link href="/auth" className="btn-primary">Create Your Free Storefront →</Link>
+          <Link href="/demo" className="btn-secondary">See Demo</Link>
         </div>
-        <p className="font-body text-xs mt-8" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          Free forever · No follower minimum · PKR payouts
-        </p>
+        <p style={{ fontSize: 12, color: '#C4C4C4', marginTop: 20 }}>Free forever · No follower minimum · PKR payouts</p>
       </section>
+
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
 
       {/* HOW IT WORKS */}
-      <section className="border-t border-white/5 py-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="font-body text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: '#C9A84C' }}>Simple Process</p>
-            <h2 className="font-display text-5xl">3 Steps to Start Earning</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {STEPS.map(({ number, title, desc }) => (
-              <div key={number} className="card-hover bg-[#141414] border border-white/5 rounded-2xl p-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[2px]"
-                  style={{ background: 'linear-gradient(90deg, transparent, #C9A84C, transparent)', opacity: 0.4 }} />
-                <p className="font-display text-5xl mb-4" style={{ color: 'rgba(201,168,76,0.3)' }}>{number}</p>
-                <h3 className="font-body font-medium text-white mb-2">{title}</h3>
-                <p className="font-body text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{desc}</p>
-              </div>
-            ))}
-          </div>
+      <section style={{ maxWidth: 1100, margin: '0 auto', padding: '72px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>Simple Process</p>
+          <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>3 Steps to Start Earning</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+          {STEPS.map(({ number, title, desc }) => (
+            <div key={number} className="card">
+              <div className="step-num">{number}</div>
+              <h3 className="display" style={{ fontSize: 20, fontWeight: 600, marginBottom: 10 }}>{title}</h3>
+              <p style={{ fontSize: 14, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
+            </div>
+          ))}
         </div>
       </section>
+
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
 
       {/* BENEFITS */}
-      <section className="border-t border-white/5 py-24 bg-[#0D0D0D]">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <p className="font-body text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: '#C9A84C' }}>Why Libaas</p>
-            <h2 className="font-display text-5xl">Everything You Need</h2>
+      <section style={{ background: '#FAFAFA', padding: '72px 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>Why Libaas</p>
+            <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Everything You Need</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {BENEFITS.map(({ icon, title, desc }) => (
-              <div key={title} className="card-hover bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <span className="text-2xl mb-3 block">{icon}</span>
-                <h3 className="font-body font-medium text-sm text-white mb-2">{title}</h3>
-                <p className="font-body text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{desc}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+            {BENEFITS.map(({ title, desc }) => (
+              <div key={title} style={{ background: '#fff', borderRadius: 14, border: '1px solid #F0F0F0', padding: 24 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 8 }}>{title}</h3>
+                <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
+
       {/* FAQ */}
-      <section className="border-t border-white/5 py-24">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-5xl">Common Questions</h2>
-          </div>
-          <div className="space-y-4">
-            {FAQS.map(({ q, a }) => (
-              <div key={q} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <h3 className="font-body font-medium text-white mb-2">{q}</h3>
-                <p className="font-body text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{a}</p>
-              </div>
-            ))}
-          </div>
+      <section style={{ maxWidth: 680, margin: '0 auto', padding: '72px 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Common Questions</h2>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {FAQS.map(({ q, a }) => (
+            <div key={q} className="faq-card">
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 8 }}>{q}</h3>
+              <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.65 }}>{a}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/5 py-24 text-center">
-        <div className="max-w-2xl mx-auto px-6">
-          <h2 className="font-display text-6xl mb-6">
-            Ready to Start<br />
-            <span className="italic" style={{ color: '#C9A84C' }}>Earning?</span>
-          </h2>
-          <p className="font-body mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Join Pakistan's first creator storefront platform. Free forever.
-          </p>
-          <Link href="/auth"
-            className="inline-block font-body px-10 py-4 rounded-full text-sm font-medium"
-            style={{ background: '#C9A84C', color: '#000' }}>
-            Create Your Free Storefront →
-          </Link>
-        </div>
+      <section style={{ background: '#1A1A1A', padding: '72px 24px', textAlign: 'center' }}>
+        <h2 className="display" style={{ fontSize: 48, fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '-0.02em' }}>
+          Ready to Start<br /><em style={{ color: '#D4AF50' }}>Earning?</em>
+        </h2>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', marginBottom: 32, fontWeight: 300 }}>
+          Join Pakistan's first creator storefront platform. Free forever.
+        </p>
+        <Link href="/auth" style={{ background: '#fff', color: '#1A1A1A', borderRadius: 100, padding: '13px 32px', fontSize: 14, fontWeight: 600, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
+          Create Your Free Storefront →
+        </Link>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/5 py-8">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="font-display text-xl tracking-wider" style={{ color: '#C9A84C' }}>LIBAAS</Link>
-          <a href="mailto:hello@thelibaas.pk"
-            className="font-body text-xs hover:text-[#C9A84C] transition-colors"
-            style={{ color: 'rgba(255,255,255,0.3)' }}>
-            hello@thelibaas.pk
-          </a>
+      <footer style={{ borderTop: '1px solid #F0F0F0', padding: '24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <span className="display" style={{ fontSize: 18, fontWeight: 600, color: '#1A1A1A' }}>Libaas</span>
+          </Link>
+          <a href="mailto:hello@thelibaas.pk" style={{ fontSize: 12, color: '#9B9B9B', textDecoration: 'none' }}>hello@thelibaas.pk</a>
         </div>
       </footer>
     </main>

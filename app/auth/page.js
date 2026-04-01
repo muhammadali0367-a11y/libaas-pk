@@ -77,7 +77,7 @@ export default function AuthPage() {
           router.push('/brand/dashboard')
         } else {
           // Shopper — no extra DB record needed, redirect to demo/browse
-          router.push('/demo')
+          router.push('/shoppers/dashboard')
         }
 
       } else {
@@ -99,7 +99,7 @@ export default function AuthPage() {
             .select('id')
             .eq('user_id', data.user.id)
             .single()
-          router.push(brand ? '/brand/dashboard' : '/demo')
+          router.push(brand ? '/brand/dashboard' : '/shoppers/dashboard')
         }
       }
     } catch (err) {

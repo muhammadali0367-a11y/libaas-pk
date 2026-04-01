@@ -72,14 +72,14 @@ export default function ShoppersPage() {
           Shop What You Love.<br /><em style={{ color: '#B8952A' }}>From Who You Trust.</em>
         </h1>
         <p style={{ fontSize: 17, color: '#6B6B6B', maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.75, fontWeight: 300 }}>
-          Browse curated Pakistani fashion storefronts from creators with real taste. No endless scrolling, no fake reviews — just honest recommendations.
+          Browse curated Pakistani fashion storefronts from creators with real taste. No account needed — just explore and shop.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          {/* Fixed: role=shopper so auth page pre-selects shopper tab. Label changed to "Start Shopping" */}
-          <Link href="/auth?mode=signup&role=shopper" className="btn-primary">Start Shopping →</Link>
+          {/* Goes directly to browse — no login required */}
+          <Link href="/shoppers/dashboard" className="btn-primary">Start Shopping →</Link>
           <Link href="/demo" className="btn-secondary">See a Storefront</Link>
         </div>
-        <p style={{ fontSize: 12, color: '#C4C4C4', marginTop: 20 }}>Free to browse · No account required to explore</p>
+        <p style={{ fontSize: 12, color: '#C4C4C4', marginTop: 20 }}>No account required · Free to browse</p>
       </section>
 
       <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
@@ -91,7 +91,7 @@ export default function ShoppersPage() {
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 10 }}>Browse Storefronts</p>
             <h2 className="display" style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>Trending Curators</h2>
           </div>
-          <Link href="/auth?mode=signup&role=shopper" style={{ fontSize: 13, color: '#B8952A', textDecoration: 'none', fontWeight: 500 }}>See all →</Link>
+          <Link href="/shoppers/dashboard" style={{ fontSize: 13, color: '#B8952A', textDecoration: 'none', fontWeight: 500 }}>See all →</Link>
         </div>
         <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
           {FEATURED_CREATORS.map(({ name, handle, specialty, items }) => (
@@ -135,9 +135,9 @@ export default function ShoppersPage() {
           Discover Your Next<br /><em style={{ color: '#D4AF50' }}>Favourite Outfit.</em>
         </h2>
         <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', marginBottom: 32, fontWeight: 300, lineHeight: 1.7 }}>
-          Join Libaas and shop the curated storefronts of Pakistan's best fashion creators.
+          Browse Pakistan's best fashion creators — no account needed.
         </p>
-        <Link href="/auth?mode=signup&role=shopper" style={{ background: '#fff', color: '#1A1A1A', borderRadius: 100, padding: '13px 32px', fontSize: 14, fontWeight: 600, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
+        <Link href="/shoppers/dashboard" style={{ background: '#fff', color: '#1A1A1A', borderRadius: 100, padding: '13px 32px', fontSize: 14, fontWeight: 600, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
           Start Shopping →
         </Link>
       </section>

@@ -18,7 +18,7 @@ const S = `
   .tab-active { background: #1A1A1A; color: #fff; }
   .tab-inactive { background: transparent; color: #9B9B9B; }
   .tab-inactive:hover { color: #1A1A1A; }
-  .role-btn { flex: 1; padding: 11px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-align: center; }
+  .role-btn { flex: 1; padding: 11px 8px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-align: center; }
   .role-active { background: #1A1A1A; color: #fff; border: 1.5px solid #1A1A1A; }
   .role-inactive { background: transparent; color: #9B9B9B; border: 1.5px solid #E8E8E8; }
   .role-inactive:hover { border-color: #C4C4C4; color: #1A1A1A; }
@@ -38,7 +38,6 @@ export default function AuthPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get('role') === 'brand') { setRole('brand'); setMode('signup') }
-    if (params.get('role') === 'shopper') { setRole('shopper'); setMode('signup') }
     if (params.get('mode') === 'signup') setMode('signup')
   }, [])
 
@@ -68,20 +67,17 @@ export default function AuthPage() {
             full_name: name
           })
           router.push('/dashboard')
-        } else if (role === 'brand') {
+        } else {
           await supabase.from('brands').insert({
             user_id: data.user.id,
             name,
             slug: name.toLowerCase().replace(/\s+/g, '-')
           })
           router.push('/brand/dashboard')
-        } else {
-          // Shopper — no extra DB record needed, redirect to demo/browse
-          router.push('/shoppers/dashboard')
         }
 
       } else {
-        // Login
+        // Login — use maybeSingle() so missing rows return null, not an error
         const { data, error: loginError } = await supabase.auth.signInWithPassword({ email, password })
         if (loginError) throw loginError
 
@@ -89,18 +85,20 @@ export default function AuthPage() {
           .from('creators')
           .select('id')
           .eq('user_id', data.user.id)
-          .single()
+          .maybeSingle()
 
-        if (creator) {
-          router.push('/dashboard')
-        } else {
-          const { data: brand } = await supabase
-            .from('brands')
-            .select('id')
-            .eq('user_id', data.user.id)
-            .single()
-          router.push(brand ? '/brand/dashboard' : '/shoppers/dashboard')
-        }
+        if (creator) { router.push('/dashboard'); return }
+
+        const { data: brand } = await supabase
+          .from('brands')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .maybeSingle()
+
+        if (brand) { router.push('/brand/dashboard'); return }
+
+        // Fallback — shouldn't happen but send to browse
+        router.push('/shoppers/dashboard')
       }
     } catch (err) {
       setError(err.message)
@@ -110,15 +108,7 @@ export default function AuthPage() {
   }
 
   return (
-    <main style={{
-      minHeight: '100vh',
-      background: '#fff',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-      fontFamily: "'Inter', sans-serif"
-    }}>
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: "'Inter', sans-serif" }}>
       <style>{S}</style>
 
       <div style={{ width: '100%', maxWidth: 420 }}>
@@ -143,11 +133,10 @@ export default function AuthPage() {
             ))}
           </div>
 
-          {/* Role toggle — signup only */}
+          {/* Role toggle — only Creator and Brand, signup only */}
           {mode === 'signup' && (
             <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
               {[
-                { key: 'shopper', label: '🛍️ Shopper' },
                 { key: 'creator', label: '✨ Creator' },
                 { key: 'brand', label: '📈 Brand' },
               ].map(({ key, label }) => (
@@ -163,8 +152,8 @@ export default function AuthPage() {
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* Name — not needed for shoppers */}
-            {mode === 'signup' && role !== 'shopper' && (
+            {/* Name */}
+            {mode === 'signup' && (
               <div>
                 <label className="label">{role === 'brand' ? 'Brand Name' : 'Full Name'}</label>
                 <input
@@ -236,14 +225,7 @@ export default function AuthPage() {
             )}
 
             <button type="submit" disabled={loading} className="btn-submit" style={{ marginTop: 4 }}>
-              {loading
-                ? 'Please wait...'
-                : mode === 'login'
-                  ? 'Log In'
-                  : role === 'shopper'
-                    ? 'Create Account'
-                    : `Create ${role.charAt(0).toUpperCase() + role.slice(1)} Account`
-              }
+              {loading ? 'Please wait...' : mode === 'login' ? 'Log In' : `Create ${role.charAt(0).toUpperCase() + role.slice(1)} Account`}
             </button>
           </form>
 

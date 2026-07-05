@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { PauseBanner } from '@/components/PauseNotice'
 
 const S = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
@@ -43,6 +44,14 @@ export default function AuthPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+
+    // Fail-closed guard: signup is paused platform-wide. Even if a future UI
+    // bug renders the signup form, this must not reach Supabase.
+    if (mode === 'signup') {
+      setError('New signup is paused. Read the Platform Update for details.')
+      return
+    }
+
     setLoading(true)
     setError('')
     try {
@@ -53,6 +62,8 @@ export default function AuthPage() {
       )
 
       if (mode === 'signup') {
+        // Unreachable: the fail-closed guard above returns before this point
+        // whenever mode === 'signup'. Left in place, not deleted, per review.
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -108,9 +119,12 @@ export default function AuthPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', fontFamily: "'Inter', sans-serif" }}>
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif" }}>
       <style>{S}</style>
 
+      <PauseBanner />
+
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         {/* Logo */}
@@ -118,7 +132,7 @@ export default function AuthPage() {
           <Link href="/" style={{ textDecoration: 'none' }}>
             <span className="display" style={{ fontSize: 32, fontWeight: 700, color: '#1A1A1A' }}>Libaas</span>
           </Link>
-          <p style={{ fontSize: 13, color: '#9B9B9B', marginTop: 8 }}>Pakistan's Creator Commerce Platform</p>
+          <p style={{ fontSize: 13, color: '#9B9B9B', marginTop: 8 }}>Pakistan's Fashion Discovery Platform</p>
         </div>
 
         {/* Card */}
@@ -128,120 +142,86 @@ export default function AuthPage() {
           <div style={{ display: 'flex', gap: 4, marginBottom: 28, background: '#F5F5F5', padding: 4, borderRadius: 12 }}>
             {['login', 'signup'].map(m => (
               <button key={m} onClick={() => setMode(m)} className={`tab ${mode === m ? 'tab-active' : 'tab-inactive'}`}>
-                {m === 'login' ? 'Log In' : 'Sign Up'}
+                {m === 'login' ? 'Log In' : 'Paused'}
               </button>
             ))}
           </div>
 
-          {/* Role toggle — only Creator and Brand, signup only */}
-          {mode === 'signup' && (
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-              {[
-                { key: 'creator', label: '✨ Creator' },
-                { key: 'brand', label: '📈 Brand' },
-              ].map(({ key, label }) => (
+          {mode === 'signup' ? (
+            /* Creator/brand signup is paused during platform review — no signup form is rendered. */
+            <div>
+              <p style={{ fontSize: 14, color: '#3A3A3A', lineHeight: 1.7, marginBottom: 20 }}>
+                Creator and brand signup is currently paused while Libaas reviews product visibility, creator guidance, storefront reliability, and brand/supply verification.
+              </p>
+              <Link href="/platform-update" className="btn-submit" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                Read the Platform Update
+              </Link>
+              <p style={{ textAlign: 'center', marginTop: 18, fontSize: 13, color: '#9B9B9B' }}>
+                Already have an account?{' '}
                 <button
-                  key={key}
-                  onClick={() => setRole(key)}
-                  className={`role-btn ${role === key ? 'role-active' : 'role-inactive'}`}>
-                  {label}
+                  onClick={() => setMode('login')}
+                  style={{ background: 'none', border: 'none', color: '#1A1A1A', fontWeight: 600, cursor: 'pointer', fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
+                  Log In
                 </button>
-              ))}
+              </p>
             </div>
-          )}
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-            {/* Name */}
-            {mode === 'signup' && (
               <div>
-                <label className="label">{role === 'brand' ? 'Brand Name' : 'Full Name'}</label>
+                <label className="label">Email</label>
                 <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder={role === 'brand' ? 'Saya' : 'Ayesha Malik'}
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
                   required
                   className="input-field"
                 />
               </div>
-            )}
 
-            {/* Username — creators only */}
-            {mode === 'signup' && role === 'creator' && (
               <div>
-                <label className="label">Username</label>
-                <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 13, color: '#C4C4C4', pointerEvents: 'none' }}>
-                    libaas.pk/
-                  </span>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={e => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
-                    placeholder="ayeshamalik"
-                    required
-                    className="input-field"
-                    style={{ paddingLeft: 96 }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="label">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="input-field"
-              />
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-                <label className="label" style={{ margin: 0 }}>Password</label>
-                {mode === 'login' && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
+                  <label className="label" style={{ margin: 0 }}>Password</label>
                   <Link href="/auth/reset" style={{ fontSize: 12, color: '#9B9B9B', textDecoration: 'none' }}>Forgot?</Link>
-                )}
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className="input-field"
+                />
               </div>
-              <input
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-                className="input-field"
-              />
-            </div>
 
-            {error && (
-              <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px' }}>
-                <p style={{ fontSize: 13, color: '#DC2626' }}>{error}</p>
-              </div>
-            )}
+              {error && (
+                <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px' }}>
+                  <p style={{ fontSize: 13, color: '#DC2626' }}>{error}</p>
+                </div>
+              )}
 
-            <button type="submit" disabled={loading} className="btn-submit" style={{ marginTop: 4 }}>
-              {loading ? 'Please wait...' : mode === 'login' ? 'Log In' : `Create ${role.charAt(0).toUpperCase() + role.slice(1)} Account`}
-            </button>
-          </form>
+              <button type="submit" disabled={loading} className="btn-submit" style={{ marginTop: 4 }}>
+                {loading ? 'Please wait...' : 'Log In'}
+              </button>
 
-          <p style={{ textAlign: 'center', marginTop: 22, fontSize: 13, color: '#9B9B9B' }}>
-            {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-            <button
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-              style={{ background: 'none', border: 'none', color: '#1A1A1A', fontWeight: 600, cursor: 'pointer', fontSize: 13, fontFamily: "'Inter', sans-serif" }}>
-              {mode === 'login' ? 'Sign Up' : 'Log In'}
-            </button>
-          </p>
+              <p style={{ textAlign: 'center', fontSize: 13, color: '#9B9B9B' }}>
+                New access is paused.{' '}
+                <Link
+                  href="/platform-update"
+                  style={{ color: '#1A1A1A', fontWeight: 600, textDecoration: 'none', fontFamily: "'Inter', sans-serif" }}>
+                  Read the Platform Update.
+                </Link>
+              </p>
+            </form>
+          )}
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 24, fontSize: 12, color: '#C4C4C4' }}>
           By continuing you agree to our Terms of Service & Privacy Policy
         </p>
+      </div>
       </div>
     </main>
   )

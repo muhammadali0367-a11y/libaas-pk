@@ -1,15 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-
-const BRANDS = ['Saya', 'Beechtree', 'Asim Jofa', 'Limelight', 'Ethnic', 'Zellbury', 'Bonanza', 'Alkaram', 'Baroque', 'Stylo']
-
-const HOW_IT_WORKS = [
-  { step: '1', title: 'Brands Join', desc: 'Pakistani fashion brands list their products and agree on a commission rate with us.' },
-  { step: '2', title: 'Creators Curate', desc: 'Creators build their personal storefront with products they genuinely love.' },
-  { step: '3', title: 'Audience Shops', desc: 'Followers shop through the creator\'s page — every sale tracked in real time.' },
-  { step: '4', title: 'Everyone Earns', desc: 'Creators earn commission in PKR. Brands get measurable ROI.' },
-]
+import { PauseBanner, PausedSurface } from '@/components/PauseNotice'
 
 const S = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
@@ -59,6 +51,8 @@ export default function HomePage() {
     <main style={{ fontFamily: "'Inter', sans-serif", background: '#fff', color: '#1A1A1A', minHeight: '100vh' }}>
       <style>{S}</style>
 
+      <PauseBanner />
+
       {/* NAV */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
@@ -78,7 +72,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Link href="/auth" className="nav-link hide-mobile">Log In</Link>
-            <Link href="/auth?mode=signup" className="btn-primary" style={{ padding: '9px 20px' }}>Sign Up</Link>
+            <Link href="/platform-update" className="btn-primary" style={{ padding: '9px 20px' }}>Platform Update</Link>
           </div>
         </div>
       </nav>
@@ -86,23 +80,16 @@ export default function HomePage() {
       {/* HERO */}
       <section style={{ maxWidth: 1140, margin: '0 auto', padding: '88px 24px 80px', textAlign: 'center' }}>
         <p className="fade-1" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 22 }}>
-          Pakistan's First Creator Commerce Platform
+          Pakistan's Fashion Discovery Platform
         </p>
         <h1 className="display fade-2" style={{ fontSize: 'clamp(48px, 7.5vw, 84px)', fontWeight: 700, lineHeight: 1.07, color: '#1A1A1A', marginBottom: 24, letterSpacing: '-0.02em' }}>
-          Shop the Taste of<br /><em style={{ color: '#B8952A' }}>Pakistan's Best.</em>
+          Discover the Taste of<br /><em style={{ color: '#B8952A' }}>Pakistan's Best.</em>
         </h1>
         <p className="fade-3" style={{ fontSize: 17, color: '#6B6B6B', maxWidth: 500, margin: '0 auto 40px', lineHeight: 1.75, fontWeight: 300 }}>
-          Discover curated fashion from Pakistan's most trusted creators. Shop their storefronts. Support local talent. Look incredible.
+          We're making fashion discovery easier for Pakistan. Creator storefronts and brand promotions are paused while we review the platform experience.
         </p>
         <div className="fade-4" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/demo" className="btn-primary">See a Creator Storefront →</Link>
-          <Link href="/join" className="btn-secondary">Become a Creator</Link>
-        </div>
-        <div style={{ marginTop: 72, paddingTop: 40, borderTop: '1px solid #F0F0F0' }}>
-          <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C4C4C4', marginBottom: 20 }}>Featuring products from</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8 }}>
-            {BRANDS.map(b => <span key={b} className="brand-tag">{b}</span>)}
-          </div>
+          <Link href="/platform-update" className="btn-primary">Read the Platform Update →</Link>
         </div>
       </section>
 
@@ -116,9 +103,9 @@ export default function HomePage() {
         </div>
         <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
           {[
-            { label: 'For Shoppers', title: 'Discover & Shop', desc: 'Browse curated storefronts from Pakistan\'s best fashion creators. Find your style through people you trust.', href: '/shoppers', cta: 'Start Shopping' },
-            { label: 'For Creators', title: 'Curate & Earn', desc: 'Build your personal fashion storefront at libaas.pk/yourname. Earn commission on every sale — paid in PKR.', href: '/join', cta: 'Join as Creator' },
-            { label: 'For Brands', title: 'Grow & Track', desc: 'Get your products in front of engaged audiences. Pay only on confirmed sales with full attribution data.', href: '/partner', cta: 'Partner with Us' },
+            { label: 'For Shoppers', title: 'Discover Fashion', desc: 'Browse and compare Pakistani fashion — discovery is being made easier for everyone.', href: '/shoppers', cta: 'Learn More' },
+            { label: 'For Creators', title: 'Curate Your Taste', desc: 'Creator storefronts and promotions are paused while Libaas reviews product visibility, creator guidance, and brand verification.', href: '/join', cta: 'Learn More' },
+            { label: 'For Brands', title: 'Get Discovered', desc: 'Brand visibility and onboarding are under review until verification and agreement rules are clear.', href: '/partner', cta: 'Learn More' },
           ].map(({ label, title, desc, href, cta }) => (
             <div key={label} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
               <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>{label}</p>
@@ -134,122 +121,12 @@ export default function HomePage() {
 
       <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
 
-      {/* HOW IT WORKS */}
-      <section style={{ background: '#FAFAFA', padding: '80px 24px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 14 }}>The Platform</p>
-            <h2 className="display" style={{ fontSize: 40, fontWeight: 600, color: '#1A1A1A', letterSpacing: '-0.01em' }}>How Libaas Works</h2>
-          </div>
-          <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-            {HOW_IT_WORKS.map(({ step, title, desc }) => (
-              <div key={step} style={{ background: '#fff', borderRadius: 14, border: '1px solid #F0F0F0', padding: 24 }}>
-                <div style={{ width: 32, height: 32, background: '#1A1A1A', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#fff', fontFamily: "'Inter', sans-serif" }}>{step}</span>
-                </div>
-                <h3 className="display" style={{ fontSize: 17, fontWeight: 600, color: '#1A1A1A', marginBottom: 8 }}>{title}</h3>
-                <p style={{ fontSize: 13, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
-
-      {/* STATS */}
-      <section style={{ maxWidth: 1140, margin: '0 auto', padding: '80px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', border: '1px solid #F0F0F0', borderRadius: 20, overflow: 'hidden' }}>
-          {[{ number: '50+', label: 'Founding Creators' }, { number: '10+', label: 'Pakistani Brands' }, { number: 'PKR', label: 'Direct Payouts' }].map(({ number, label }) => (
-            <div key={label} className="stat-box">
-              <p className="display" style={{ fontSize: 'clamp(44px, 5.5vw, 60px)', fontWeight: 700, color: '#1A1A1A', marginBottom: 8, letterSpacing: '-0.02em' }}>{number}</p>
-              <p style={{ fontSize: 11, color: '#9B9B9B', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
-
-      {/* FOR CREATORS */}
-      <section style={{ maxWidth: 1140, margin: '0 auto', padding: '80px 24px' }}>
-        <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
-          <div>
-            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 16 }}>For Creators</p>
-            <h2 className="display" style={{ fontSize: 'clamp(34px, 4.5vw, 48px)', fontWeight: 600, lineHeight: 1.12, color: '#1A1A1A', marginBottom: 18, letterSpacing: '-0.01em' }}>
-              Your Storefront.<br /><em style={{ color: '#B8952A' }}>Your Rules.</em>
-            </h2>
-            <p style={{ fontSize: 15, color: '#6B6B6B', lineHeight: 1.75, marginBottom: 32, fontWeight: 300 }}>
-              Stop doing one-off paid promotions. Build a real income stream by curating products your audience already trusts you on.
-            </p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <Link href="/join" className="btn-primary">Join as a Creator</Link>
-              <Link href="/demo" className="btn-secondary">See Demo</Link>
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {[
-              { title: 'Your Own Storefront', desc: 'A beautiful shop at libaas.pk/yourname — curated by you.' },
-              { title: 'Earn in PKR', desc: 'Commission paid to JazzCash or bank account monthly.' },
-              { title: 'Real-Time Analytics', desc: 'See clicks, orders, and earnings updated live.' },
-              { title: 'Top Pakistani Brands', desc: 'Access to Saya, Baroque, Limelight and more.' },
-            ].map(({ title, desc }) => (
-              <div key={title} className="card">
-                <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 8 }}>{title}</h3>
-                <p style={{ fontSize: 12, color: '#6B6B6B', lineHeight: 1.6 }}>{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <hr style={{ border: 'none', borderTop: '1px solid #F0F0F0', margin: 0 }} />
-
-      {/* FOR BRANDS */}
-      <section style={{ background: '#FAFAFA', padding: '80px 24px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
-            <div style={{ background: '#fff', borderRadius: 20, padding: 32, border: '1px solid #F0F0F0' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: '#F0F0F0', borderRadius: 12, overflow: 'hidden' }}>
-                {[{ label: 'Total Clicks', value: '—' }, { label: 'Active Creators', value: '—' }, { label: 'Confirmed Orders', value: '—' }, { label: 'Revenue', value: 'PKR —' }].map(({ label, value }) => (
-                  <div key={label} style={{ background: '#fff', padding: '24px 20px' }}>
-                    <p className="display" style={{ fontSize: 26, fontWeight: 600, color: '#1A1A1A', marginBottom: 4 }}>{value}</p>
-                    <p style={{ fontSize: 10, color: '#9B9B9B', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</p>
-                  </div>
-                ))}
-              </div>
-              <p style={{ fontSize: 11, color: '#C4C4C4', textAlign: 'center', marginTop: 16 }}>Your brand dashboard — real-time attribution</p>
-            </div>
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9B9B9B', marginBottom: 16 }}>For Brands</p>
-              <h2 className="display" style={{ fontSize: 'clamp(34px, 4.5vw, 48px)', fontWeight: 600, lineHeight: 1.12, color: '#1A1A1A', marginBottom: 18, letterSpacing: '-0.01em' }}>
-                Pay Only For<br /><em style={{ color: '#B8952A' }}>Real Sales.</em>
-              </h2>
-              <p style={{ fontSize: 15, color: '#6B6B6B', lineHeight: 1.75, marginBottom: 32, fontWeight: 300 }}>
-                Complete attribution — every click, every order, every creator. Only 3 founding brand partner slots available.
-              </p>
-              <Link href="/partner" className="btn-gold">Claim a Founding Slot →</Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section style={{ background: '#1A1A1A', padding: '80px 24px', textAlign: 'center' }}>
-        <h2 className="display" style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 700, color: '#fff', marginBottom: 18, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-          Ready to Start<br /><em style={{ color: '#D4AF50' }}>Earning?</em>
-        </h2>
-        <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', marginBottom: 36, lineHeight: 1.7, fontWeight: 300 }}>
-          Whether you're a shopper, a creator, or a brand — Libaas is built for you.
-        </p>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/auth?mode=signup" style={{ background: '#fff', color: '#1A1A1A', borderRadius: 100, padding: '12px 28px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
-            Create Free Account →
-          </Link>
-          <Link href="/partner" style={{ background: 'transparent', color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)', borderRadius: 100, padding: '11px 28px', fontSize: 13, fontWeight: 500, textDecoration: 'none', display: 'inline-block', fontFamily: "'Inter', sans-serif" }}>
-            Partner as a Brand
-          </Link>
-        </div>
+      {/* PLATFORM PAUSED */}
+      <section style={{ background: '#FAFAFA' }}>
+        <PausedSurface
+          heading="Libaas Creator is currently paused."
+          note="We are reviewing product visibility, creator guidance, storefront reliability, and brand/supply verification before creator promotions resume. Trust comes first."
+        />
       </section>
 
       {/* FOOTER */}
@@ -264,7 +141,7 @@ export default function HomePage() {
           <a href="mailto:hello@thelibaas.pk" style={{ fontSize: 12, color: '#9B9B9B', textDecoration: 'none' }}>hello@thelibaas.pk</a>
         </div>
         <div style={{ maxWidth: 1140, margin: '16px auto 0', paddingTop: 16, borderTop: '1px solid #F0F0F0', textAlign: 'center' }}>
-          <p style={{ fontSize: 11, color: '#C4C4C4' }}>© 2025 Libaas · Pakistan's First Creator Commerce Platform</p>
+          <p style={{ fontSize: 11, color: '#C4C4C4' }}>© 2025 Libaas · Pakistan's Fashion Discovery Platform</p>
         </div>
       </footer>
     </main>

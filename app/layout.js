@@ -3,8 +3,8 @@ import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 
 export const metadata = {
-  title: 'Libaas — Pakistan\'s First Creator Storefront Platform',
-  description: 'Build your personal fashion storefront. Curate products from Pakistan\'s top brands. Earn commission on every sale — paid in PKR.',
+  title: 'Libaas — Pakistan\'s Fashion Discovery Platform',
+  description: 'Libaas Creator is currently paused while we review product visibility, creator guidance, and brand/supply verification.',
   icons: {
     icon: [
       { url: '/favicon.ico' },

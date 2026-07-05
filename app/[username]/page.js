@@ -2,10 +2,10 @@ import Link from 'next/link'
 import { PauseBanner, PausedSurface } from '@/components/PauseNotice'
 
 export const metadata = {
-  title: 'Demo Paused — Libaas',
+  title: 'Storefront Paused — Libaas',
 }
 
-export default function DemoPausedPage() {
+export default function StorefrontPausedPage() {
   return (
     <main style={{ fontFamily: "'Inter', sans-serif", background: '#fff', minHeight: '100vh' }}>
       <PauseBanner />
@@ -20,8 +20,8 @@ export default function DemoPausedPage() {
       </nav>
 
       <PausedSurface
-        heading="The creator storefront demo is paused."
-        note="We're not showing example storefronts, products, or brand links while Libaas reviews product visibility, creator guidance, storefront reliability, and brand/supply verification."
+        heading="This creator storefront is paused."
+        note="Public creator storefronts are paused while Libaas reviews product visibility, creator guidance, storefront reliability, and brand/supply verification. Creators should not promote products from the platform until this review is complete."
       />
     </main>
   )
